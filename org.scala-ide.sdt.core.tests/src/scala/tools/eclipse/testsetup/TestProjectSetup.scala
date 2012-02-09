@@ -11,9 +11,8 @@ import scala.tools.eclipse.javaelements.ScalaCompilationUnit
 import org.eclipse.jdt.core.IProblemRequestor
 import org.eclipse.jdt.core.WorkingCopyOwner
 import org.eclipse.core.runtime.NullProgressMonitor
-
-
 import org.mockito.Mockito.{mock, when}
+import org.eclipse.core.resources.IFile
 
 /** Base class for setting up tests that depend on a project found in the test-workspace.
  * 
@@ -44,6 +43,10 @@ class TestProjectSetup(projectName: String)  {
   assertNotNull(srcPackageRoot)
 
   srcPackageRoot.open(null)
+  
+  def file(path: String): IFile = {
+    project.underlying.getFile(path)
+  }
   
   /** Return the compilation unit corresponding to the given path, relative to the src folder.
    *  for example: "scala/collection/Map.scala"
