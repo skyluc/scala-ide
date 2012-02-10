@@ -235,7 +235,6 @@
        </action>
        <action
              class="scala.tools.eclipse.actions.ScalaStepOverAction"
-             enablesFor="1"
              id="org.scala-ide.sdt.core.action1"
              label="Scala Step Over"
              menubarPath="org_scala-ide_sdt_ui_menu/additions"
