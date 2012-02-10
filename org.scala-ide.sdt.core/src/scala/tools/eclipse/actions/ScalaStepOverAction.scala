@@ -18,6 +18,7 @@ import org.eclipse.ui.IWorkbenchWindowActionDelegate
 import com.sun.jdi.AbsentInformationException
 import com.sun.jdi.Method
 import org.eclipse.swt.widgets.Event
+import scala.tools.eclipse.debug.ScalaDebugger
 
 class ScalaStepOverAction extends IWorkbenchWindowActionDelegate with IActionDelegate2 with INullSelectionListener{
   
@@ -28,11 +29,13 @@ class ScalaStepOverAction extends IWorkbenchWindowActionDelegate with IActionDel
   def dispose() {}
   
   def init(window: IWorkbenchWindow) {
+    // register to selection change events from the debug view
     window.getSelectionService.addSelectionListener("org.eclipse.debug.ui.DebugView", this)
   }
   
   def init(a: IAction) {
     action= a
+    action.setEnabled(false)
   }
   
   def runWithEvent(a: IAction, event: Event) {
@@ -40,50 +43,12 @@ class ScalaStepOverAction extends IWorkbenchWindowActionDelegate with IActionDel
   }
 
   def run(action: IAction) {
-    run(selectedStackFrame)
-  }
-  
-  def run(stackFrame: JDIStackFrame) {
-    
-    import scala.collection.JavaConverters._
-    
-    val method= stackFrame.getUnderlyingMethod
-    val nestedTypes= method.declaringType.nestedTypes
-    val currentLine= stackFrame.getLineNumber
-    val methodLastLine= method.allLineLocations.asScala.map(_.lineNumber).max
-    val methods= method.declaringType.methods
-    
-    def methodToLines(m: Method) =
-      try {
-        m.allLineLocations.asScala.map(_.lineNumber)
-      } catch {
-        case e: AbsentInformationException =>
-          Nil
-        case e =>
-          throw e
-      }
-    
-    val nextMethodFirstLine= (methods.asScala.flatten(methodToLines(_)).filter(_ > methodLastLine) :+ Int.MaxValue).min
-    
-    val closuresInRange= nestedTypes.asScala.flatten(_.methods.asScala).filter(m => {
-      val minLine= (methodToLines(m) :+ Int.MaxValue).min
-      minLine >= currentLine && minLine < nextMethodFirstLine && m.name.startsWith("apply$")
-    })
-    
-    import scala.collection.mutable.Map
-    
-    val attributes= Map(IBreakpoint.PERSISTED -> true)
-    
-    for (m <- closuresInRange) {
-      JDIDebugModel.createMethodEntryBreakpoint(ResourcesPlugin.getWorkspace().getRoot(), m.declaringType.name, m.name, m.signature, methodToLines(m).min, -1, -1, -1, true, attributes.asJava)
-    }
-  
-    stackFrame.stepOver
+    ScalaDebugger.stepOver(selectedStackFrame)
   }
   
   def selectionChanged(action: IAction, selection: ISelection) {
-    // this event is not used. Only the events from the debug view are interesting
-    println("arggg")
+    // not interested in this event. The other method receives selection change
+    // events from the debug view.
   }
   
   def selectionChanged(part: IWorkbenchPart, selection: ISelection ) {

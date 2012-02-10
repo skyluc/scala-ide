@@ -43,7 +43,7 @@ class ScalaDebugSteppingTest {
     assertEquals("Suspended in the wrong type", TYPENAME, initialStackFrame.get.getDeclaringTypeName)
     assertEquals("Suspended on the wrong line", 9, initialStackFrame.get.getLineNumber)
     
-    new ScalaStepOverAction().run(initialStackFrame.get)
+    ScalaDebugger.stepOver(initialStackFrame.get)
     
     val nextStackFrame= runToSuspend()
     
