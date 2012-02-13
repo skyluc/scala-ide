@@ -38,7 +38,7 @@ trait LocateSymbol { self : ScalaPresentationCompiler =>
       val project = scu.getJavaProject.asInstanceOf[JavaProject]
       val pfs = new SearchableEnvironment(project, null: WorkingCopyOwner).nameLookup.findPackageFragments(packName, false)
       if (pfs eq null) None else find(pfs) { pf =>
-        val top = sym.toplevelClass
+        val top = sym.enclosingTopLevelClass
         val name = top.name + (if (top.isModule) "$" else "") + ".class"
         val cf = pf.getClassFile(name)
         cf match {
@@ -52,7 +52,7 @@ trait LocateSymbol { self : ScalaPresentationCompiler =>
       logger.info("Looking for a compilation unit for " + sym.fullName)
       val project = scu.getJavaProject.asInstanceOf[JavaProject]
       val nameLookup = new SearchableEnvironment(project, null: WorkingCopyOwner).nameLookup
-      val name = sym.toplevelClass.fullName
+      val name = sym.enclosingTopLevelClass.fullName
       Option(nameLookup.findCompilationUnit(name)) map (_.getResource().getFullPath())
     }
     

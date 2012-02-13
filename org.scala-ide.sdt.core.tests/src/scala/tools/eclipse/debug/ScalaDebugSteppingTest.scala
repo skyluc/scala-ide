@@ -90,7 +90,7 @@ trait ScalaDebugTest extends TestProjectSetup {
   
 }
 
-class DebugEventManager extends IDebugEventSetListener with HasLogger {
+class DebugEventManager extends IDebugEventSetListener {
   
   DebugPlugin.getDefault.addDebugEventListener(this)
   
