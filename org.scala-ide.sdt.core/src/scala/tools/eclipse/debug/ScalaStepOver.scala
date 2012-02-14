@@ -44,9 +44,10 @@ object ScalaStepOver {
 
     val loadedAnonFunctionsInRange = currentMethod.declaringType.nestedTypes.asScala.flatMap(anonFunctionsInRange(_, range))
 
-    val breakpoints = loadedAnonFunctionsInRange.map(createMethodEntryBreakpoint(_))
+    val thread = stackFrame.getThread.asInstanceOf[JDIThread]
+    val breakpoints = loadedAnonFunctionsInRange.map(createMethodEntryBreakpoint(_, thread))
 
-    val step = new ScalaStepOver(range, stackFrame.getThread.asInstanceOf[JDIThread], classPrepareRequest, breakpoints)
+    val step = new ScalaStepOver(range, thread, classPrepareRequest, breakpoints)
     DebugPlugin.getDefault.addDebugEventListener(step)
 
     // enable request
@@ -55,20 +56,33 @@ object ScalaStepOver {
 
     // enable breakpoints
     breakpoints.foreach(target.breakpointAdded(_))
-    
+
     step
   }
 
-  def createMethodEntryBreakpoint(method: Method) = {
+  def createMethodEntryBreakpoint(method: Method, thread: JDIThread) = {
     import scala.collection.JavaConverters._
     import scala.collection.mutable.Map
-    JDIDebugModel.createMethodEntryBreakpoint(ResourcesPlugin.getWorkspace().getRoot(), method.declaringType.name, method.name, method.signature, method.location.lineNumber, -1, -1, -1, false, Map(IBreakpoint.PERSISTED -> false).asJava)
+    val breakpoint= JDIDebugModel.createMethodEntryBreakpoint(ResourcesPlugin.getWorkspace().getRoot(), method.declaringType.name, method.name, method.signature, method.location.lineNumber, -1, -1, -1, false, Map(IBreakpoint.PERSISTED -> false).asJava)
+    breakpoint.setThreadFilter(thread)
+    breakpoint
   }
 
   def anonFunctionsInRange(refType: ReferenceType, range: Range) = {
     import scala.collection.JavaConverters._
-    refType.methods.asScala.find(method =>
-      range.contains(method.location.lineNumber) && method.name.startsWith("apply$"))
+    val methods = refType.methods.asScala.filter(method =>
+      range.contains(method.location.lineNumber) && method.name.startsWith("apply"))
+      
+    methods.size match {
+      case 3 =>
+        methods.find(_.name.startsWith("apply$"))
+      case 2 =>
+        methods.find(_.signature != "(Ljava/lang/Object;)Ljava/lang/Object;")
+      case 1 =>
+        methods.headOption
+      case _ =>
+        None
+    }
   }
 
 }
@@ -86,8 +100,8 @@ class ScalaStepOver(range: Range, thread: JDIThread, classPrepareRequest: ClassP
     event match {
       case classPrepareEvent: ClassPrepareEvent =>
         anonFunctionsInRange(classPrepareEvent.referenceType, range).foreach(method => {
-          val breakpoint = createMethodEntryBreakpoint(method)
-          breakpoints+= breakpoint
+          val breakpoint = createMethodEntryBreakpoint(method, thread)
+          breakpoints += breakpoint
           target.breakpointAdded(breakpoint)
         })
         true
@@ -97,31 +111,31 @@ class ScalaStepOver(range: Range, thread: JDIThread, classPrepareRequest: ClassP
   }
 
   /* from IDebugEventSetListener */
-  
+
   def handleDebugEvents(events: Array[DebugEvent]) {
     events.foreach(event => {
       event.getKind match {
         case DebugEvent.SUSPEND =>
           if (event.getSource == thread)
-              cleanAll()
+            cleanAll()
         case DebugEvent.TERMINATE =>
           if (event.getSource == thread)
-              cleanAll()
+            cleanAll()
         case _ =>
       }
     })
   }
-  
+
   // -----
-  
+
   def cleanAll() {
-    val target= thread.getJavaDebugTarget
+    val target = thread.getJavaDebugTarget
 
     DebugPlugin.getDefault.removeDebugEventListener(this)
-    
+
     classPrepareRequest.disable
     target.getEventDispatcher.removeJDIEventListener(this, classPrepareRequest)
-    
+
     breakpoints.foreach(target.breakpointRemoved(_, null))
   }
 
