@@ -140,11 +140,11 @@ class ScalaDebugTestSession(launchConfigurationFile: IFile) extends IDebugEventS
 
   // -----
 
-  def checkStackFrame(typeName: String, methodName: String, line: Int) {
-    assertEquals("Bad state before checkStackFrame", SUSPENDED, state)
+  def checkStackFrame(typeName: String, methodFullSignature: String, line: Int) {
+   assertEquals("Bad state before checkStackFrame", SUSPENDED, state)
 
     assertEquals("Wrong typeName", typeName, currentStackFrame.getDeclaringTypeName)
-    assertEquals("Wrong method", methodName, currentStackFrame.getMethodName)
+    assertEquals("Wrong method", methodFullSignature, currentStackFrame.getMethodName + currentStackFrame.getSignature)
     assertEquals("Wrong line", line, currentStackFrame.getLineNumber)
   }
 

@@ -28,7 +28,13 @@ import org.eclipse.jdt.core.dom.Message
 import scala.tools.eclipse.logging.HasLogger
 import org.junit.After
 
-object ScalaDebugSteppingTest extends TestProjectSetup("debug")
+object ScalaDebugSteppingTest extends TestProjectSetup("debug") {
+
+  val TYPENAME_FC_LS = "stepping.ForComprehensionListString"
+  val TYPENAME_FC_LO = "stepping.ForComprehensionListObject"
+  val TYPENAME_FC_LI = "stepping.ForComprehensionListInt"
+
+}
 
 class ScalaDebugSteppingTest {
 
@@ -43,21 +49,185 @@ class ScalaDebugSteppingTest {
       session = null
     }
   }
+  
+  /*
+   * Testing step over/in for comprehension through List[String]
+   */
 
   @Test
-  def StepOverIntoForComprehension() {
+  def StepOverIntoForComprehensionListStringInObjectMain() {
 
     session = new ScalaDebugTestSession(file("ForComprehensionListString.launch"))
 
-    val TYPENAME = "stepping.ForComprehensionListString$"
+    session.runToLine(TYPENAME_FC_LS + "$", 9)
 
-    session.runToLine(TYPENAME, 9)
-    
-    session.checkStackFrame(TYPENAME, "main", 9)
-    
+    session.checkStackFrame(TYPENAME_FC_LS + "$", "main([Ljava/lang/String;)V", 9)
+
     session.stepOver()
-    
-    session.checkStackFrame(TYPENAME + "$anonfun$main$1", "apply", 10)
+
+    session.checkStackFrame(TYPENAME_FC_LS + "$$anonfun$main$1", "apply(Ljava/lang/String;)I", 10)
+  }
+
+  @Test
+  def StepOverIntoForComprehensionListStringInObjectFoo() {
+
+    session = new ScalaDebugTestSession(file("ForComprehensionListString.launch"))
+
+    session.runToLine(TYPENAME_FC_LS + "$", 19)
+
+    session.checkStackFrame(TYPENAME_FC_LS + "$", "foo(Lscala/collection/immutable/List;)V", 19)
+
+    session.stepOver()
+
+    session.checkStackFrame(TYPENAME_FC_LS + "$$anonfun$foo$1", "apply(Ljava/lang/String;)I", 20)
+  }
+
+  @Test
+  def StepOverIntoForComprehensionListStringInClassConstructor() {
+
+    session = new ScalaDebugTestSession(file("ForComprehensionListString.launch"))
+
+    session.runToLine(TYPENAME_FC_LS, 29)
+
+    session.checkStackFrame(TYPENAME_FC_LS, "<init>(Lscala/collection/immutable/List;)V", 29)
+
+    session.stepOver()
+
+    session.checkStackFrame(TYPENAME_FC_LS + "$$anonfun$1", "apply(Ljava/lang/String;)I", 30)
+  }
+  
+  @Test
+  def StepOverIntoForComprehensionListStringInClassBar() {
+
+    session = new ScalaDebugTestSession(file("ForComprehensionListString.launch"))
+
+    session.runToLine(TYPENAME_FC_LS, 35)
+
+    session.checkStackFrame(TYPENAME_FC_LS, "bar()V", 35)
+
+    session.stepOver()
+
+    session.checkStackFrame(TYPENAME_FC_LS + "$$anonfun$bar$1", "apply(Ljava/lang/String;)I", 36)
+  }
+
+  /*
+   * Testing step over/in for comprehension through List[Object]
+   */
+
+  @Test
+  def StepOverIntoForComprehensionListObjectInObjectMain() {
+
+    session = new ScalaDebugTestSession(file("ForComprehensionListObject.launch"))
+
+    session.runToLine(TYPENAME_FC_LO + "$", 9)
+
+    session.checkStackFrame(TYPENAME_FC_LO + "$", "main([Ljava/lang/String;)V", 9)
+
+    session.stepOver()
+
+    session.checkStackFrame(TYPENAME_FC_LO + "$$anonfun$main$1", "apply(Ljava/lang/Object;)Ljava/lang/Object;", 10)
+  }
+
+  @Test
+  def StepOverIntoForComprehensionListObjectInObjectFoo() {
+
+    session = new ScalaDebugTestSession(file("ForComprehensionListObject.launch"))
+
+    session.runToLine(TYPENAME_FC_LO + "$", 19)
+
+    session.checkStackFrame(TYPENAME_FC_LO + "$", "foo(Lscala/collection/immutable/List;)V", 19)
+
+    session.stepOver()
+
+    session.checkStackFrame(TYPENAME_FC_LO + "$$anonfun$foo$1", "apply(Ljava/lang/Object;)Ljava/lang/Object;", 20)
+  }
+
+  @Test
+  def StepOverIntoForComprehensionListObjectInClassConstructor() {
+
+    session = new ScalaDebugTestSession(file("ForComprehensionListObject.launch"))
+
+    session.runToLine(TYPENAME_FC_LO, 29)
+
+    session.checkStackFrame(TYPENAME_FC_LO, "<init>(Lscala/collection/immutable/List;)V", 29)
+
+    session.stepOver()
+
+    session.checkStackFrame(TYPENAME_FC_LO + "$$anonfun$1", "apply(Ljava/lang/Object;)Ljava/lang/Object;", 30)
+  }
+  
+  @Test
+  def StepOverIntoForComprehensionListObjectInClassBar() {
+
+    session = new ScalaDebugTestSession(file("ForComprehensionListObject.launch"))
+
+    session.runToLine(TYPENAME_FC_LO, 35)
+
+    session.checkStackFrame(TYPENAME_FC_LO, "bar()V", 35)
+
+    session.stepOver()
+
+    session.checkStackFrame(TYPENAME_FC_LO + "$$anonfun$bar$1", "apply(Ljava/lang/Object;)Ljava/lang/Object;", 36)
+  }
+
+  /*
+   * Testing step over/in for comprehension through List[Int]
+   */
+
+  @Test
+  def StepOverIntoForComprehensionListIntInObjectMain() {
+
+    session = new ScalaDebugTestSession(file("ForComprehensionListInt.launch"))
+
+    session.runToLine(TYPENAME_FC_LI + "$", 11)
+
+    session.checkStackFrame(TYPENAME_FC_LI + "$", "main([Ljava/lang/String;)V", 11)
+
+    session.stepOver()
+
+    session.checkStackFrame(TYPENAME_FC_LI + "$$anonfun$main$1", "apply$mcVI$sp(I)V", 12)
+  }
+
+  @Test
+  def StepOverIntoForComprehensionListIntInObjectFoo() {
+
+    session = new ScalaDebugTestSession(file("ForComprehensionListInt.launch"))
+
+    session.runToLine(TYPENAME_FC_LI + "$", 21)
+
+    session.checkStackFrame(TYPENAME_FC_LI + "$", "foo(Lscala/collection/immutable/List;)V", 21)
+
+    session.stepOver()
+
+    session.checkStackFrame(TYPENAME_FC_LI + "$$anonfun$foo$1", "apply$mcVI$sp(I)V", 22)
+  }
+
+  @Test
+  def StepOverIntoForComprehensionListIntInClassConstructor() {
+
+    session = new ScalaDebugTestSession(file("ForComprehensionListInt.launch"))
+
+    session.runToLine(TYPENAME_FC_LI, 31)
+
+    session.checkStackFrame(TYPENAME_FC_LI, "<init>(Lscala/collection/immutable/List;)V", 31)
+
+    session.stepOver()
+
+    session.checkStackFrame(TYPENAME_FC_LI + "$$anonfun$1", "apply$mcVI$sp(I)V", 32)
+  }
+  
+  @Test
+  def StepOverIntoForComprehensionListIntInClassBar() {
+
+    session = new ScalaDebugTestSession(file("ForComprehensionListInt.launch"))
+
+    session.runToLine(TYPENAME_FC_LI, 37)
+
+    session.checkStackFrame(TYPENAME_FC_LI, "bar()V", 37)
+
+    session.stepOver()
+
+    session.checkStackFrame(TYPENAME_FC_LI + "$$anonfun$bar$1", "apply$mcVI$sp(I)V", 38)
   }
 
 }

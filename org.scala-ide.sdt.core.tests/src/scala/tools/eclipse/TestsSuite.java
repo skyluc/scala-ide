@@ -3,6 +3,7 @@ package scala.tools.eclipse;
 import scala.tools.eclipse.classpath.ClasspathTests;
 import scala.tools.eclipse.compiler.settings.CompilerSettingsTest;
 import scala.tools.eclipse.completion.CompletionTests;
+import scala.tools.eclipse.debug.ScalaDebugSteppingTest;
 
 import scala.tools.eclipse.hyperlinks.HyperlinkDetectorTests;
 import scala.tools.eclipse.jcompiler.AbstractMethodVerifierTest;
@@ -51,5 +52,6 @@ import org.junit.runners.Suite;
   ScalaJavaDepTest.class,
   NestedProjectsTest.class,
   CompilerSettingsTest.class,
+  ScalaDebugSteppingTest.class,
 })
 class TestsSuite { }
