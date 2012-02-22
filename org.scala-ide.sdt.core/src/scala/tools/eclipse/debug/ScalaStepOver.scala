@@ -75,7 +75,11 @@ object ScalaStepOver {
       
     methods.size match {
       case 3 =>
-        methods.find(_.name.startsWith("apply$"))
+        methods.find(_.name.startsWith("apply$")).orElse({
+          // workaround for SI-5512
+          // scalac 2.10.0-M2 add an extraneous apply method in some cases
+          methods.find(! _.signature.startsWith("(Ljava/lang/Object;)"))
+        })
       case 2 =>
         methods.find(_.signature != "(Ljava/lang/Object;)Ljava/lang/Object;")
       case 1 =>
