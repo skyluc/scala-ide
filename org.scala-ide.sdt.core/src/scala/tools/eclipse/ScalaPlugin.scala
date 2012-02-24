@@ -37,6 +37,7 @@ import scala.tools.eclipse.util.EclipseResource
 import scala.tools.eclipse.logging.PluginLogConfigurator
 import scala.tools.eclipse.util.Trim
 import scala.tools.nsc.Settings
+import scala.tools.eclipse.debug.ScalaDebugger
 
 object ScalaPlugin {
   var plugin: ScalaPlugin = _
@@ -175,6 +176,7 @@ class ScalaPlugin extends AbstractUIPlugin with PluginLogConfigurator with IReso
     ResourcesPlugin.getWorkspace.addResourceChangeListener(this, IResourceChangeEvent.PRE_CLOSE)
     JavaCore.addElementChangedListener(this)
     logger.info("Scala compiler bundle: " + scalaCompilerBundle.getLocation)
+    ScalaDebugger.init()
   }
 
   override def stop(context: BundleContext) = {

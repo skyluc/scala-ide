@@ -12,7 +12,6 @@ import org.eclipse.debug.core.DebugEvent
 import org.eclipse.jdt.internal.debug.core.model.JDIDebugTarget
 import org.eclipse.jdt.internal.debug.core.model.JDIStackFrame
 import org.eclipse.jdt.internal.debug.core.model.JDIThread
-import scala.tools.eclipse.actions.ScalaStepOverAction
 import org.eclipse.debug.core.model.RuntimeProcess
 import org.hamcrest.Matcher
 import org.junit.matchers.JUnitMatchers

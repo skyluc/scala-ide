@@ -253,16 +253,6 @@
                toolbarPath="Normal/Presentation"
                tooltip="Show inferred semicolons">
         </action>        
-        <action
-              class="scala.tools.eclipse.actions.ScalaStepOverAction"
-              disabledIcon="icons/full/dlcl16/stepover_co_from_eclipse.gif"
-              icon="icons/full/elcl16/stepover_co_from_eclipse.gif"
-              id="org.scala-ide.sdt.core.action1"
-              label="Scala Step Over"
-              style="push"
-              toolbarPath="Normal/Presentation"
-              tooltip="Scala step over">
-       </action>       
       </actionSet>
    </extension>
 
@@ -1281,5 +1271,12 @@
           </with>
        </enablement>
     </moveParticipant>
+ </extension>
+ <extension
+       point="org.eclipse.debug.ui.debugModelPresentations">
+    <debugModelPresentation
+          class="scala.tools.eclipse.debug.ScalaDebugModelPresentation"
+          id="org.scala-ide.sdt.debug">
+    </debugModelPresentation>
  </extension>
 </plugin>

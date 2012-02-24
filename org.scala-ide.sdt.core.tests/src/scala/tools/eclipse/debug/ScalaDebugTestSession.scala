@@ -10,8 +10,6 @@ import org.eclipse.jdt.debug.core.JDIDebugModel
 import org.eclipse.core.resources.ResourcesPlugin
 import org.eclipse.debug.core.IDebugEventSetListener
 import org.eclipse.debug.core.DebugEvent
-import org.eclipse.jdt.internal.debug.core.model.JDIThread
-import org.eclipse.jdt.internal.debug.core.model.JDIStackFrame
 
 class ScalaDebugTestSession(launchConfigurationFile: IFile) extends IDebugEventSetListener {
 
@@ -30,7 +28,7 @@ class ScalaDebugTestSession(launchConfigurationFile: IFile) extends IDebugEventS
       event.getKind match {
         case DebugEvent.CREATE =>
           event.getSource match {
-            case target: JDIDebugTarget =>
+            case target: ScalaDebugTarget =>
               setLaunched(target)
             case _ =>
           }
@@ -38,14 +36,15 @@ class ScalaDebugTestSession(launchConfigurationFile: IFile) extends IDebugEventS
           setRunning
         case DebugEvent.SUSPEND =>
           event.getSource match {
-            case thread: JDIThread =>
-              setSuspended(thread.getTopStackFrame.asInstanceOf[JDIStackFrame])
-            case _ =>
+            case thread: ScalaThread =>
+              setSuspended(thread.getTopStackFrame.asInstanceOf[ScalaStackFrame])
+            case target: ScalaDebugTarget =>
               setSuspended(null)
+            case _ =>
           }
         case DebugEvent.TERMINATE =>
           event.getSource match {
-            case target: JDIDebugTarget =>
+            case target: ScalaDebugTarget =>
               setTerminated
             case _ =>
           }
@@ -55,7 +54,7 @@ class ScalaDebugTestSession(launchConfigurationFile: IFile) extends IDebugEventS
 
   // ----
 
-  def setLaunched(target: JDIDebugTarget) {
+  def setLaunched(target: ScalaDebugTarget) {
     this.synchronized {
       debugTarget = target
       setRunning
@@ -69,7 +68,7 @@ class ScalaDebugTestSession(launchConfigurationFile: IFile) extends IDebugEventS
     }
   }
 
-  def setSuspended(stackFrame: JDIStackFrame) {
+  def setSuspended(stackFrame: ScalaStackFrame) {
     this.synchronized {
       currentStackFrame = stackFrame
       state = SUSPENDED
@@ -95,8 +94,8 @@ class ScalaDebugTestSession(launchConfigurationFile: IFile) extends IDebugEventS
   // ----
 
   var state = NOT_LAUNCHED
-  var debugTarget: JDIDebugTarget = null
-  var currentStackFrame: JDIStackFrame = null
+  var debugTarget: ScalaDebugTarget = null
+  var currentStackFrame: ScalaStackFrame = null
 
   def runToLine(typeName: String, breakpointLine: Int) {
     assertThat("Bad state before runToBreakpoint", state, anyOf(is(NOT_LAUNCHED), is(SUSPENDED)))
@@ -118,7 +117,7 @@ class ScalaDebugTestSession(launchConfigurationFile: IFile) extends IDebugEventS
   def stepOver() {
     assertEquals("Bad state before stepOver", SUSPENDED, state)
 
-    ScalaDebugger.stepOver(currentStackFrame)
+    currentStackFrame.stepOver
 
     waitUntilSuspended
 
@@ -143,8 +142,8 @@ class ScalaDebugTestSession(launchConfigurationFile: IFile) extends IDebugEventS
   def checkStackFrame(typeName: String, methodFullSignature: String, line: Int) {
    assertEquals("Bad state before checkStackFrame", SUSPENDED, state)
 
-    assertEquals("Wrong typeName", typeName, currentStackFrame.getDeclaringTypeName)
-    assertEquals("Wrong method", methodFullSignature, currentStackFrame.getMethodName + currentStackFrame.getSignature)
+    assertEquals("Wrong typeName", typeName, currentStackFrame.stackFrame.location.declaringType.name)
+    assertEquals("Wrong method", methodFullSignature, currentStackFrame.stackFrame.location.method.name + currentStackFrame.stackFrame.location.method.signature)
     assertEquals("Wrong line", line, currentStackFrame.getLineNumber)
   }
 
