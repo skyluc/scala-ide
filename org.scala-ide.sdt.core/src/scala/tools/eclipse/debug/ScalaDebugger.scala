@@ -29,6 +29,8 @@ import org.eclipse.jdt.core.dom.Message
 import org.eclipse.jdt.internal.debug.core.model.JDIThread
 import scala.collection.mutable.Buffer
 import org.eclipse.debug.core.sourcelookup.ISourceLookupDirector
+import scala.tools.eclipse.ScalaPlugin
+import scala.tools.eclipse.properties.DebugPreferencePage
 
 object ScalaDebugger extends IDebugEventSetListener {
   
@@ -52,7 +54,9 @@ object ScalaDebugger extends IDebugEventSetListener {
         case DebugEvent.CREATE =>
           event.getSource match {
             case target: JDIDebugTarget => 
-              javaDebugTargetCreated(target)
+              if (ScalaPlugin.plugin.getPreferenceStore.getBoolean(DebugPreferencePage.P_ENABLE)) {
+                javaDebugTargetCreated(target)
+              }
             case _ =>
           }
         case DebugEvent.SUSPEND =>

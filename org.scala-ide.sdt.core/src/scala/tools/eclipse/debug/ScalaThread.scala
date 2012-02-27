@@ -54,7 +54,7 @@ class ScalaThread(target: ScalaDebugTarget, val thread: ThreadReference) extends
     currentStep.foreach(_.stop)
     suspended= true
     
-    stackFrames= thread.frames.asScala.map(new ScalaStackFrame(getScalaDebugTarget, this, _)).toList
+    stackFrames= thread.frames.asScala.map(new ScalaStackFrame(this, _)).toList
     fireSuspendEvent(eventDetail)
   }
   
@@ -62,7 +62,7 @@ class ScalaThread(target: ScalaDebugTarget, val thread: ThreadReference) extends
     import scala.collection.JavaConverters._
     suspended= true
     
-    stackFrames= thread.frames.asScala.map(new ScalaStackFrame(getScalaDebugTarget, this, _)).toList
+    stackFrames= thread.frames.asScala.map(new ScalaStackFrame(this, _)).toList
     fireSuspendEvent(eventDetail)
   }
   

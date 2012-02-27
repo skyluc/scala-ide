@@ -12,6 +12,8 @@ object ForComprehensionListString {
 
     foo(l)
     new ForComprehensionListString(l).bar
+    
+    println("done")
   }
 
   def foo(l: List[String]) {

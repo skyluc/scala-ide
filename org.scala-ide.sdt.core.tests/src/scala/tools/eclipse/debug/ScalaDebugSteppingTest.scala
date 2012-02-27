@@ -26,6 +26,9 @@ import org.eclipse.jdt.debug.core.IJavaLineBreakpoint
 import org.eclipse.jdt.core.dom.Message
 import scala.tools.eclipse.logging.HasLogger
 import org.junit.After
+import org.junit.Before
+import scala.tools.eclipse.ScalaPlugin
+import scala.tools.eclipse.properties.DebugPreferencePage
 
 object ScalaDebugSteppingTest extends TestProjectSetup("debug") {
 
@@ -42,6 +45,11 @@ class ScalaDebugSteppingTest {
   import ScalaDebugSteppingTest._
 
   var session: ScalaDebugTestSession = null
+  
+  @Before
+  def setScalaDebugMode() {
+    ScalaPlugin.plugin.getPreferenceStore.setValue(DebugPreferencePage.P_ENABLE, true)
+  }
 
   @After
   def cleanDebugSession() {

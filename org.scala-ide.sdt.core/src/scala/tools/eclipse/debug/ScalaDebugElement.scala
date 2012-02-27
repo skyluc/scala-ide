@@ -18,7 +18,7 @@ class ScalaDebugElement(target: ScalaDebugTarget) extends DebugElement(target) w
       case ScalaDebugger.classIDebugModelProvider =>
         modelProvider
       case _ =>
-        logger.debug("%s getAdapter %s".format(this.getClass.getName, adapter.getName))
+//        logger.debug("%s getAdapter %s".format(this.getClass.getName, adapter.getName))
         super.getAdapter(adapter)
     }
   }

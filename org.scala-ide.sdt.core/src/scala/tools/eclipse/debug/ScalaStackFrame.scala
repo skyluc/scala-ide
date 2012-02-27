@@ -4,7 +4,7 @@ import com.sun.jdi.StackFrame
 import org.eclipse.debug.core.model.IStackFrame
 import org.eclipse.jdt.debug.core.IJavaStackFrame
 
-class ScalaStackFrame(target: ScalaDebugTarget, val thread: ScalaThread, val stackFrame: StackFrame) extends ScalaDebugElement(target) with IStackFrame {
+class ScalaStackFrame(val thread: ScalaThread, val stackFrame: StackFrame) extends ScalaDebugElement(thread.getScalaDebugTarget) with IStackFrame {
 
   // Members declared in org.eclipse.debug.core.model.IStackFrame
   
@@ -14,7 +14,7 @@ class ScalaStackFrame(target: ScalaDebugTarget, val thread: ScalaThread, val sta
   def getName(): String = stackFrame.location.declaringType.name // TODO: cache data ?
   def getRegisterGroups(): Array[org.eclipse.debug.core.model.IRegisterGroup] = ???
   def getThread(): org.eclipse.debug.core.model.IThread = thread
-  def getVariables(): Array[org.eclipse.debug.core.model.IVariable] = Array() // TODO: need real logic
+  def getVariables(): Array[org.eclipse.debug.core.model.IVariable] = variables.toArray // TODO: need real logic
   def hasRegisterGroups(): Boolean = ???
   def hasVariables(): Boolean = ???
   
@@ -39,6 +39,11 @@ class ScalaStackFrame(target: ScalaDebugTarget, val thread: ScalaThread, val sta
   // ---
   
   fireCreationEvent
+  
+  val variables = {
+    import scala.collection.JavaConverters._
+    stackFrame.visibleVariables.asScala.map(new ScalaLocalVariable(_, this))
+  }
   
   def getSourceName(): String = stackFrame.location.sourceName
 

@@ -8,6 +8,8 @@ import org.eclipse.core.resources.IFile
 import org.eclipse.ui.part.FileEditorInput
 import org.eclipse.ui.ide.IDE
 import org.eclipse.ui.IFileEditorInput
+import org.eclipse.debug.core.model.IValue
+import org.eclipse.debug.ui.IValueDetailListener
 
 class ScalaDebugModelPresentation extends IDebugModelPresentation {
 
@@ -20,7 +22,10 @@ class ScalaDebugModelPresentation extends IDebugModelPresentation {
 
   // Members declared in org.eclipse.debug.ui.IDebugModelPresentation
 
-  def computeDetail(x$1: org.eclipse.debug.core.model.IValue, x$2: org.eclipse.debug.ui.IValueDetailListener): Unit = ???
+  def computeDetail(value: IValue, listener: IValueDetailListener): Unit = {
+    // TODO: the real work
+    listener.detailComputed(value, null)
+  }
   
   def getImage(element: Any): org.eclipse.swt.graphics.Image = {
     element match {
@@ -33,6 +38,9 @@ class ScalaDebugModelPresentation extends IDebugModelPresentation {
       case stackFrame: ScalaStackFrame =>
         // TODO: right image depending of state
         DebugUITools.getImage(IDebugUIConstants.IMG_OBJS_STACKFRAME)
+      case variable: ScalaVariable =>
+        // TODO: right image depending on ?
+        DebugUITools.getImage(IDebugUIConstants.IMG_OBJS_VARIABLE)
       case _ =>
         ???
     }
