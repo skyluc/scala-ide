@@ -41,8 +41,13 @@ object ScalaStepOver {
 
     val loadedAnonFunctionsInRange = location.method.declaringType.nestedTypes.asScala.flatMap(anonFunctionsInRange(_, range))
 
-    val entryBreakpoints = loadedAnonFunctionsInRange.map(createMethodEntryBreakpoint(_, scalaStackFrame.stackFrame.thread))
+    // if we are in an anonymous function, add the method
+    if (location.declaringType.name.contains("$$anonfun$")) {
+      loadedAnonFunctionsInRange ++= scalaStackFrame.getScalaDebugTarget.findAnonFunction(location.declaringType)
+    }
 
+    val entryBreakpoints = loadedAnonFunctionsInRange.map(createMethodEntryBreakpoint(_, scalaStackFrame.stackFrame.thread))
+    
     new ScalaStepOver(scalaStackFrame.getScalaDebugTarget, range, scalaStackFrame.thread, classPrepareRequest, stepOverRequest, entryBreakpoints)
   }
 
@@ -55,10 +60,15 @@ object ScalaStepOver {
     breakpointRequest
   }
 
+  
+  // TODO: use ScalaDebugTarget#findAnonFunction
   def anonFunctionsInRange(refType: ReferenceType, range: Range) = {
     import scala.collection.JavaConverters._
     val methods = refType.methods.asScala.filter(method =>
       range.contains(method.location.lineNumber) && method.name.startsWith("apply"))
+      
+    // TODO: using isBridge was not working with List[Int]. Should check if we can use it by default with some extra checks when it fails.
+//      methods.find(!_.isBridge)
       
     methods.size match {
       case 3 =>
@@ -85,20 +95,24 @@ class ScalaStepOver(target: ScalaDebugTarget, range: Range, thread: ScalaThread,
     // nothing to do
   }
 
-  def handleEvent(event: Event, target: JDIDebugTarget, suspendVote: Boolean, eventSet: EventSet): Boolean = {
+  def handleEvent(event: Event, javaTarget: JDIDebugTarget, suspendVote: Boolean, eventSet: EventSet): Boolean = {
     event match {
       case classPrepareEvent: ClassPrepareEvent =>
         anonFunctionsInRange(classPrepareEvent.referenceType, range).foreach(method => {
           val breakpoint = createMethodEntryBreakpoint(method, thread.thread)
           entryBreakpoints += breakpoint
-          target.getEventDispatcher.addJDIEventListener(this, breakpoint)
+          javaTarget.getEventDispatcher.addJDIEventListener(this, breakpoint)
           breakpoint.enable
         })
         true
       case stepEvent: StepEvent =>
-        stop
-        thread.suspendedFromScala(DebugEvent.STEP_OVER)
-        false
+        if (target.isValidLocation(stepEvent.location)) {
+          stop
+          thread.suspendedFromScala(DebugEvent.STEP_OVER)
+          false
+        } else {
+          true
+        }
       case breakpointEvent: BreakpointEvent =>
         stop
         thread.suspendedFromScala(DebugEvent.STEP_OVER)

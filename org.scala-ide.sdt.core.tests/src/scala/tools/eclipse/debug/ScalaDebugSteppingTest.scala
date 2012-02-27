@@ -30,6 +30,7 @@ import org.junit.After
 object ScalaDebugSteppingTest extends TestProjectSetup("debug") {
 
   val TYPENAME_FC_LS = "stepping.ForComprehensionListString"
+  val TYPENAME_FC_LS2 = "stepping.ForComprehensionListString2"
   val TYPENAME_FC_LO = "stepping.ForComprehensionListObject"
   val TYPENAME_FC_LI = "stepping.ForComprehensionListInt"
   val TYPENAME_AF_LS = "stepping.AnonFunOnListString"
@@ -108,6 +109,42 @@ class ScalaDebugSteppingTest {
     session.stepOver()
 
     session.checkStackFrame(TYPENAME_FC_LS + "$$anonfun$bar$1", "apply(Ljava/lang/String;)I", 36)
+  }
+  
+  /*
+   * Testing step over/back in for comprehension through List[String]
+   */
+  
+  @Test
+  def StepOverBackInForComprehentionListString() {
+
+    session = new ScalaDebugTestSession(file("ForComprehensionListString.launch"))
+
+    session.runToLine(TYPENAME_FC_LS + "$", 10)
+
+    session.checkStackFrame(TYPENAME_FC_LS + "$$anonfun$main$1", "apply(Ljava/lang/String;)I", 10)
+
+    session.stepOver()
+
+    session.checkStackFrame(TYPENAME_FC_LS + "$$anonfun$main$1", "apply(Ljava/lang/String;)I", 10)
+  }
+
+  /*
+   * Testing step over/out for comprehension through List[String]
+   */
+  
+  @Test
+  def StepOverOutForComprehentionListString() {
+
+    session = new ScalaDebugTestSession(file("ForComprehensionListString2.launch"))
+
+    session.runToLine(TYPENAME_FC_LS2 + "$", 12)
+
+    session.checkStackFrame(TYPENAME_FC_LS2 + "$$anonfun$main$1", "apply(Ljava/lang/String;)I", 12)
+
+    session.stepOver()
+
+    session.checkStackFrame(TYPENAME_FC_LS2 + "$", "main([Ljava/lang/String;)V", 15)
   }
 
   /*

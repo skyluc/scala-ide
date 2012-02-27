@@ -13,6 +13,9 @@ import com.sun.jdi.request.ThreadDeathRequest
 import com.sun.jdi.event.ThreadStartEvent
 import com.sun.jdi.event.ThreadDeathEvent
 import org.eclipse.jdt.internal.debug.core.model.JDIThread
+import com.sun.jdi.Location
+import com.sun.jdi.ReferenceType
+import com.sun.jdi.Method
 
 object ScalaDebugTarget {
 
@@ -135,6 +138,40 @@ class ScalaDebugTarget(val javaTarget: JDIDebugTarget, threadStartRequest: Threa
     threads.clear
     running= false
     fireTerminateEvent
+  }
+  
+  def findAnonFunction(refType: ReferenceType): Option[Method] = {
+    import scala.collection.JavaConverters._
+    val methods = refType.methods.asScala.filter(method => method.name.startsWith("apply"))
+      
+    // TODO: using isBridge was not working with List[Int]. Should check if we can use it by default with some extra checks when it fails.
+//      methods.find(!_.isBridge)
+      
+    methods.size match {
+      case 3 =>
+        // method with primitive parameter
+        methods.find(_.name.startsWith("apply$")).orElse({
+          // method with primitive return type (with specialization in 2.10.0)
+          methods.find(! _.signature.startsWith("(Ljava/lang/Object;)"))
+        })
+      case 2 =>
+        methods.find(_.signature != "(Ljava/lang/Object;)Ljava/lang/Object;")
+      case 1 =>
+        methods.headOption
+      case _ =>
+        None
+    }  }
+  
+  def isValidLocation(location: Location): Boolean= {
+    val typeName= location.declaringType.name
+    // TODO: use better pattern matching
+    // TODO: check for bridge methods?
+    if (typeName.startsWith("scala.collection"))
+      false
+    else if (typeName.contains("$$anonfun$")) {  
+      findAnonFunction(location.declaringType).exists(_ == location.method)
+    } else
+      true
   }
 
 }
