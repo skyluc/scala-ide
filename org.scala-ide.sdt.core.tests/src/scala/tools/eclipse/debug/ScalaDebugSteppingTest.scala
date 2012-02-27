@@ -32,6 +32,7 @@ object ScalaDebugSteppingTest extends TestProjectSetup("debug") {
   val TYPENAME_FC_LS = "stepping.ForComprehensionListString"
   val TYPENAME_FC_LO = "stepping.ForComprehensionListObject"
   val TYPENAME_FC_LI = "stepping.ForComprehensionListInt"
+  val TYPENAME_AF_LS = "stepping.AnonFunOnListString"
 
 }
 
@@ -227,6 +228,66 @@ class ScalaDebugSteppingTest {
     session.stepOver()
 
     session.checkStackFrame(TYPENAME_FC_LI + "$$anonfun$bar$1", "apply$mcVI$sp(I)V", 38)
+  }
+  
+  /*
+   * Testing step over/in List[String] methods
+   */
+  
+  @Test
+  def StepOverIntoListStringForEach() {
+    
+    session = new ScalaDebugTestSession(file("AnonFunOnListString.launch"))
+    
+    session.runToLine(TYPENAME_AF_LS + "$", 11)
+    
+    session.checkStackFrame(TYPENAME_AF_LS + "$", "main([Ljava/lang/String;)V", 11)
+    
+    session.stepOver()
+    
+    session.checkStackFrame(TYPENAME_AF_LS + "$$anonfun$main$1", "apply(Ljava/lang/String;)V", 11)
+  }
+
+  @Test
+  def StepOverIntoListStringFind() {
+    
+    session = new ScalaDebugTestSession(file("AnonFunOnListString.launch"))
+    
+    session.runToLine(TYPENAME_AF_LS + "$", 13)
+    
+    session.checkStackFrame(TYPENAME_AF_LS + "$", "main([Ljava/lang/String;)V", 13)
+    
+    session.stepOver()
+    
+    session.checkStackFrame(TYPENAME_AF_LS + "$$anonfun$main$2", "apply(Ljava/lang/String;)Z", 13)
+  }
+
+  @Test
+  def StepOverIntoListStringMap() {
+    
+    session = new ScalaDebugTestSession(file("AnonFunOnListString.launch"))
+    
+    session.runToLine(TYPENAME_AF_LS + "$", 15)
+    
+    session.checkStackFrame(TYPENAME_AF_LS + "$", "main([Ljava/lang/String;)V", 15)
+    
+    session.stepOver()
+    
+    session.checkStackFrame(TYPENAME_AF_LS + "$$anonfun$main$3", "apply(Ljava/lang/String;)I", 15)
+  }
+
+  @Test
+  def StepOverIntoListStringFoldLeft() {
+    
+    session = new ScalaDebugTestSession(file("AnonFunOnListString.launch"))
+    
+    session.runToLine(TYPENAME_AF_LS + "$", 17)
+    
+    session.checkStackFrame(TYPENAME_AF_LS + "$", "main([Ljava/lang/String;)V", 17)
+    
+    session.stepOver()
+    
+    session.checkStackFrame(TYPENAME_AF_LS + "$$anonfun$main$4", "apply(ILjava/lang/String;)I", 17)
   }
 
 }
