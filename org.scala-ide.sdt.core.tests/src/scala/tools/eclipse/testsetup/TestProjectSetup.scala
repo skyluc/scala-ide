@@ -26,7 +26,7 @@ import org.eclipse.core.resources.IFile
  *  Example: `object HyperlinkDetectorTests extends TestProjectSetup("hyperlinks")'
  * 
  */
-class TestProjectSetup(projectName: String)  {
+class TestProjectSetup(projectName: String, srcRoot: String = "/%s/src/")  {
   type ScalaUnit = ScalaCompilationUnit with ICompilationUnit
   
   /** The ScalaProject corresponding to projectName, after copying to the test workspace. */
@@ -37,7 +37,7 @@ class TestProjectSetup(projectName: String)  {
     val javaProject = JavaCore.create(project.underlying)
 
     javaProject.open(null)
-    javaProject.findPackageFragmentRoot(new Path("/%s/src".format(projectName)))
+    javaProject.findPackageFragmentRoot(new Path(srcRoot.format(projectName)))
   }
 
   assertNotNull(srcPackageRoot)
