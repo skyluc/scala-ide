@@ -1,21 +1,16 @@
-package scala.tools.eclipse.debug
+package scala.tools.eclipse.debug.model
 
-import org.eclipse.jdt.internal.debug.core.model.JDIDebugTarget
+import scala.Option.option2Iterable
+import scala.collection.JavaConverters.asScalaBufferConverter
+import scala.tools.eclipse.debug.ScalaDebugger
+
 import org.eclipse.debug.core.model.IDebugTarget
-import com.sun.jdi.VirtualMachine
-import org.eclipse.debug.core.model.IProcess
-import com.sun.jdi.request.ThreadStartRequest
-import com.sun.jdi.request.EventRequest
+import org.eclipse.jdt.internal.debug.core.model.{JDIThread, JDIDebugTarget}
 import org.eclipse.jdt.internal.debug.core.IJDIEventListener
-import com.sun.jdi.event.Event
-import com.sun.jdi.event.EventSet
-import com.sun.jdi.request.ThreadDeathRequest
-import com.sun.jdi.event.ThreadStartEvent
-import com.sun.jdi.event.ThreadDeathEvent
-import org.eclipse.jdt.internal.debug.core.model.JDIThread
-import com.sun.jdi.Location
-import com.sun.jdi.ReferenceType
-import com.sun.jdi.Method
+
+import com.sun.jdi.event.{ThreadStartEvent, ThreadDeathEvent, EventSet, Event}
+import com.sun.jdi.request.{ThreadStartRequest, ThreadDeathRequest, EventRequest}
+import com.sun.jdi.{ReferenceType, Method, Location}
 
 object ScalaDebugTarget {
 
@@ -120,39 +115,39 @@ class ScalaDebugTarget(val javaTarget: JDIDebugTarget, threadStartRequest: Threa
   }
 
   // ---
-  
-  var running: Boolean= true
+
+  var running: Boolean = true
 
   val threads = {
     import scala.collection.JavaConverters._
     javaTarget.getVM.allThreads.asScala.map(new ScalaThread(this, _))
   }
-  
+
   fireCreationEvent
 
   def javaThreadSuspended(thread: JDIThread, eventDetail: Int) {
     threads.find(_.thread == thread.getUnderlyingThread).get.suspendedFromJava(eventDetail)
   }
-  
+
   def terminatedFromJava() {
     threads.clear
-    running= false
+    running = false
     fireTerminateEvent
   }
-  
+
   def findAnonFunction(refType: ReferenceType): Option[Method] = {
     import scala.collection.JavaConverters._
     val methods = refType.methods.asScala.filter(method => method.name.startsWith("apply"))
-      
+
     // TODO: using isBridge was not working with List[Int]. Should check if we can use it by default with some extra checks when it fails.
-//      methods.find(!_.isBridge)
-      
+    //      methods.find(!_.isBridge)
+
     methods.size match {
       case 3 =>
         // method with primitive parameter
         methods.find(_.name.startsWith("apply$")).orElse({
           // method with primitive return type (with specialization in 2.10.0)
-          methods.find(! _.signature.startsWith("(Ljava/lang/Object;)"))
+          methods.find(!_.signature.startsWith("(Ljava/lang/Object;)"))
         })
       case 2 =>
         methods.find(_.signature != "(Ljava/lang/Object;)Ljava/lang/Object;")
@@ -160,15 +155,16 @@ class ScalaDebugTarget(val javaTarget: JDIDebugTarget, threadStartRequest: Threa
         methods.headOption
       case _ =>
         None
-    }  }
-  
-  def isValidLocation(location: Location): Boolean= {
-    val typeName= location.declaringType.name
+    }
+  }
+
+  def isValidLocation(location: Location): Boolean = {
+    val typeName = location.declaringType.name
     // TODO: use better pattern matching
     // TODO: check for bridge methods?
     if (typeName.startsWith("scala.collection"))
       false
-    else if (typeName.contains("$$anonfun$")) {  
+    else if (typeName.contains("$$anonfun$")) {
       findAnonFunction(location.declaringType).exists(_ == location.method)
     } else
       true

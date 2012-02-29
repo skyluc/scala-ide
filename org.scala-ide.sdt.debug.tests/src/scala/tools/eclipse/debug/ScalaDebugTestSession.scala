@@ -1,15 +1,13 @@
 package scala.tools.eclipse.debug
 
-import org.junit.Assert._
-import org.hamcrest.CoreMatchers._
-import org.eclipse.debug.core.DebugPlugin
-import org.eclipse.core.resources.IFile
-import org.eclipse.debug.core.ILaunchManager
-import org.eclipse.jdt.internal.debug.core.model.JDIDebugTarget
+import scala.tools.eclipse.debug.model.{ScalaThread, ScalaStackFrame, ScalaDebugTarget}
+
+import org.eclipse.core.resources.{ResourcesPlugin, IFile}
+import org.eclipse.debug.core.{ILaunchManager, IDebugEventSetListener, DebugPlugin, DebugEvent}
 import org.eclipse.jdt.debug.core.JDIDebugModel
-import org.eclipse.core.resources.ResourcesPlugin
-import org.eclipse.debug.core.IDebugEventSetListener
-import org.eclipse.debug.core.DebugEvent
+import org.eclipse.jdt.internal.debug.core.model.JDIDebugTarget
+import org.hamcrest.CoreMatchers._
+import org.junit.Assert._
 
 class ScalaDebugTestSession(launchConfigurationFile: IFile) extends IDebugEventSetListener {
 
@@ -140,7 +138,7 @@ class ScalaDebugTestSession(launchConfigurationFile: IFile) extends IDebugEventS
   // -----
 
   def checkStackFrame(typeName: String, methodFullSignature: String, line: Int) {
-   assertEquals("Bad state before checkStackFrame", SUSPENDED, state)
+    assertEquals("Bad state before checkStackFrame", SUSPENDED, state)
 
     assertEquals("Wrong typeName", typeName, currentStackFrame.stackFrame.location.declaringType.name)
     assertEquals("Wrong method", methodFullSignature, currentStackFrame.stackFrame.location.method.name + currentStackFrame.stackFrame.location.method.signature)

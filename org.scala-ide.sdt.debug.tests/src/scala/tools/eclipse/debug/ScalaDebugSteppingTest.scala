@@ -1,34 +1,8 @@
 package scala.tools.eclipse.debug
 
 import scala.tools.eclipse.testsetup.TestProjectSetup
-import org.junit.Test
-import org.junit.Assert._
-import org.eclipse.debug.core.DebugPlugin
-import org.eclipse.debug.core.ILaunchManager
-import org.eclipse.jdt.debug.core.JDIDebugModel
-import org.eclipse.core.resources.ResourcesPlugin
-import org.eclipse.debug.core.IDebugEventSetListener
-import org.eclipse.debug.core.DebugEvent
-import org.eclipse.jdt.internal.debug.core.model.JDIDebugTarget
-import org.eclipse.jdt.internal.debug.core.model.JDIStackFrame
-import org.eclipse.jdt.internal.debug.core.model.JDIThread
-import org.eclipse.debug.core.model.RuntimeProcess
-import org.hamcrest.Matcher
-import org.junit.matchers.JUnitMatchers
-import org.eclipse.jdt.debug.core.IJavaBreakpointListener
-import org.eclipse.jdt.debug.core.IJavaDebugTarget
-import org.eclipse.jdt.debug.core.IJavaBreakpoint
-import org.eclipse.jdt.debug.core.IJavaType
-import org.eclipse.debug.core.IBreakpointListener
-import org.eclipse.jdt.debug.core.IJavaThread
-import org.eclipse.debug.core.DebugException
-import org.eclipse.jdt.debug.core.IJavaLineBreakpoint
-import org.eclipse.jdt.core.dom.Message
-import scala.tools.eclipse.logging.HasLogger
-import org.junit.After
-import org.junit.Before
-import scala.tools.eclipse.ScalaPlugin
-import scala.tools.eclipse.properties.DebugPreferencePage
+
+import org.junit.{Test, Before, After}
 
 object ScalaDebugSteppingTest extends TestProjectSetup("debug") {
 
@@ -45,10 +19,10 @@ class ScalaDebugSteppingTest {
   import ScalaDebugSteppingTest._
 
   var session: ScalaDebugTestSession = null
-  
+
   @Before
   def setScalaDebugMode() {
-    ScalaPlugin.plugin.getPreferenceStore.setValue(DebugPreferencePage.P_ENABLE, true)
+    ScalaDebugPlugin.plugin.getPreferenceStore.setValue(DebugPreferencePage.P_ENABLE, true)
   }
 
   @After
@@ -58,7 +32,7 @@ class ScalaDebugSteppingTest {
       session = null
     }
   }
-  
+
   /*
    * Testing step over/in for comprehension through List[String]
    */
@@ -104,7 +78,7 @@ class ScalaDebugSteppingTest {
 
     session.checkStackFrame(TYPENAME_FC_LS + "$$anonfun$1", "apply(Ljava/lang/String;)I", 30)
   }
-  
+
   @Test
   def StepOverIntoForComprehensionListStringInClassBar() {
 
@@ -118,11 +92,11 @@ class ScalaDebugSteppingTest {
 
     session.checkStackFrame(TYPENAME_FC_LS + "$$anonfun$bar$1", "apply(Ljava/lang/String;)I", 36)
   }
-  
+
   /*
    * Testing step over/back in for comprehension through List[String]
    */
-  
+
   @Test
   def StepOverBackInForComprehentionListString() {
 
@@ -140,7 +114,7 @@ class ScalaDebugSteppingTest {
   /*
    * Testing step over/out for comprehension through List[String]
    */
-  
+
   @Test
   def StepOverOutForComprehentionListString() {
 
@@ -200,7 +174,7 @@ class ScalaDebugSteppingTest {
 
     session.checkStackFrame(TYPENAME_FC_LO + "$$anonfun$1", "apply(Ljava/lang/Object;)Ljava/lang/Object;", 30)
   }
-  
+
   @Test
   def StepOverIntoForComprehensionListObjectInClassBar() {
 
@@ -260,7 +234,7 @@ class ScalaDebugSteppingTest {
 
     session.checkStackFrame(TYPENAME_FC_LI + "$$anonfun$1", "apply$mcVI$sp(I)V", 32)
   }
-  
+
   @Test
   def StepOverIntoForComprehensionListIntInClassBar() {
 
@@ -274,64 +248,64 @@ class ScalaDebugSteppingTest {
 
     session.checkStackFrame(TYPENAME_FC_LI + "$$anonfun$bar$1", "apply$mcVI$sp(I)V", 38)
   }
-  
+
   /*
    * Testing step over/in List[String] methods
    */
-  
+
   @Test
   def StepOverIntoListStringForEach() {
-    
+
     session = new ScalaDebugTestSession(file("AnonFunOnListString.launch"))
-    
+
     session.runToLine(TYPENAME_AF_LS + "$", 11)
-    
+
     session.checkStackFrame(TYPENAME_AF_LS + "$", "main([Ljava/lang/String;)V", 11)
-    
+
     session.stepOver()
-    
+
     session.checkStackFrame(TYPENAME_AF_LS + "$$anonfun$main$1", "apply(Ljava/lang/String;)V", 11)
   }
 
   @Test
   def StepOverIntoListStringFind() {
-    
+
     session = new ScalaDebugTestSession(file("AnonFunOnListString.launch"))
-    
+
     session.runToLine(TYPENAME_AF_LS + "$", 13)
-    
+
     session.checkStackFrame(TYPENAME_AF_LS + "$", "main([Ljava/lang/String;)V", 13)
-    
+
     session.stepOver()
-    
+
     session.checkStackFrame(TYPENAME_AF_LS + "$$anonfun$main$2", "apply(Ljava/lang/String;)Z", 13)
   }
 
   @Test
   def StepOverIntoListStringMap() {
-    
+
     session = new ScalaDebugTestSession(file("AnonFunOnListString.launch"))
-    
+
     session.runToLine(TYPENAME_AF_LS + "$", 15)
-    
+
     session.checkStackFrame(TYPENAME_AF_LS + "$", "main([Ljava/lang/String;)V", 15)
-    
+
     session.stepOver()
-    
+
     session.checkStackFrame(TYPENAME_AF_LS + "$$anonfun$main$3", "apply(Ljava/lang/String;)I", 15)
   }
 
   @Test
   def StepOverIntoListStringFoldLeft() {
-    
+
     session = new ScalaDebugTestSession(file("AnonFunOnListString.launch"))
-    
+
     session.runToLine(TYPENAME_AF_LS + "$", 17)
-    
+
     session.checkStackFrame(TYPENAME_AF_LS + "$", "main([Ljava/lang/String;)V", 17)
-    
+
     session.stepOver()
-    
+
     session.checkStackFrame(TYPENAME_AF_LS + "$$anonfun$main$4", "apply(ILjava/lang/String;)I", 17)
   }
 

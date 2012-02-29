@@ -1,19 +1,15 @@
-package scala.tools.eclipse
-package properties
-
-import org.eclipse.jface.preference._
-import org.eclipse.ui.IWorkbenchPreferencePage
-import org.eclipse.ui.IWorkbench
+package scala.tools.eclipse.debug
 
 import org.eclipse.core.runtime.preferences.AbstractPreferenceInitializer
-import org.eclipse.jface.preference.IPreferenceStore
+import org.eclipse.jface.preference.{FieldEditorPreferencePage, BooleanFieldEditor}
+import org.eclipse.ui.{IWorkbenchPreferencePage, IWorkbench}
 
-import scala.tools.eclipse.ScalaPlugin
+import DebugPreferencePage.P_ENABLE
 
 class DebugPreferencePage extends FieldEditorPreferencePage with IWorkbenchPreferencePage {
   import DebugPreferencePage._
 
-  setPreferenceStore(ScalaPlugin.plugin.getPreferenceStore)
+  setPreferenceStore(ScalaDebugPlugin.plugin.getPreferenceStore)
   setDescription("""Experimental debugger for Scala.
 To use it, launch your Scala application as usual.""")
 
@@ -35,7 +31,7 @@ class DebugPreferenceInitializer extends AbstractPreferenceInitializer {
   import DebugPreferencePage._
 
   override def initializeDefaultPreferences() {
-    val store = ScalaPlugin.plugin.getPreferenceStore
+    val store = ScalaDebugPlugin.plugin.getPreferenceStore
     store.setDefault(P_ENABLE, false)
   }
 

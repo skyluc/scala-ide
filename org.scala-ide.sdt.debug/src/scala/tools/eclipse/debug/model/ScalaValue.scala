@@ -1,19 +1,10 @@
-package scala.tools.eclipse.debug
+package scala.tools.eclipse.debug.model
+
+import scala.collection.JavaConverters.asScalaBufferConverter
 
 import org.eclipse.debug.core.model.IValue
-import com.sun.jdi.Value
-import com.sun.jdi.ArrayReference
-import com.sun.jdi.BooleanValue
-import com.sun.jdi.ByteValue
-import com.sun.jdi.CharValue
-import com.sun.jdi.ObjectReference
-import com.sun.jdi.StringReference
-import com.sun.jdi.DoubleValue
-import com.sun.jdi.FloatValue
-import com.sun.jdi.IntegerValue
-import com.sun.jdi.LongValue
-import com.sun.jdi.ShortValue
-import com.sun.jdi.VoidValue
+
+import com.sun.jdi.{VoidValue, Value, StringReference, ShortValue, ObjectReference, LongValue, IntegerValue, FloatValue, DoubleValue, CharValue, ByteValue, BooleanValue, ArrayReference}
 
 object ScalaValue {
 
@@ -63,13 +54,13 @@ abstract class ScalaValue(target: ScalaDebugTarget) extends ScalaDebugElement(ta
 }
 
 class ScalaArrayReference(val arrayReference: ArrayReference, target: ScalaDebugTarget) extends ScalaValue(target) {
-  
+
   // Members declared in org.eclipse.debug.core.model.IValue
 
   def getReferenceTypeName(): String = arrayReference.`type`.name
   def getValueString(): String = "an array" // TODO: need real value
   def getVariables(): Array[org.eclipse.debug.core.model.IVariable] = {
-      (0 until arrayReference.length).map(new ScalaArrayVariable(_, this)).toArray
+    (0 until arrayReference.length).map(new ScalaArrayVariable(_, this)).toArray
   }
   def hasVariables(): Boolean = arrayReference.length > 0
 }
@@ -87,7 +78,7 @@ class ScalaObjectReference(val objectReference: ObjectReference, target: ScalaDe
 
   def getReferenceTypeName(): String = objectReference.referenceType.name
   def getValueString(): String = "an object" // TODO: need real value
-  def getVariables(): Array[org.eclipse.debug.core.model.IVariable] =  {
+  def getVariables(): Array[org.eclipse.debug.core.model.IVariable] = {
     import scala.collection.JavaConverters._
     objectReference.referenceType.allFields.asScala.map(new ScalaFieldVariable(_, this)).toArray
   }
@@ -96,10 +87,10 @@ class ScalaObjectReference(val objectReference: ObjectReference, target: ScalaDe
 }
 
 class ScalaNullValue(target: ScalaDebugTarget) extends ScalaValue(target) {
-  
+
   def getReferenceTypeName(): String = "null"
   def getValueString(): String = "null"
   def getVariables(): Array[org.eclipse.debug.core.model.IVariable] = Array()
   def hasVariables(): Boolean = false
-  
+
 }

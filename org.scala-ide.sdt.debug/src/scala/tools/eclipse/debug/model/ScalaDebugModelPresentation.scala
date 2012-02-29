@@ -1,15 +1,11 @@
-package scala.tools.eclipse.debug
+package scala.tools.eclipse.debug.model
 
-import org.eclipse.debug.ui.IDebugModelPresentation
-import org.eclipse.debug.ui.DebugUITools
-import org.eclipse.debug.ui.IDebugUIConstants
-import org.eclipse.ui.IEditorInput
 import org.eclipse.core.resources.IFile
-import org.eclipse.ui.part.FileEditorInput
-import org.eclipse.ui.ide.IDE
-import org.eclipse.ui.IFileEditorInput
 import org.eclipse.debug.core.model.IValue
-import org.eclipse.debug.ui.IValueDetailListener
+import org.eclipse.debug.ui.{IValueDetailListener, IDebugUIConstants, IDebugModelPresentation, DebugUITools}
+import org.eclipse.ui.ide.IDE
+import org.eclipse.ui.part.FileEditorInput
+import org.eclipse.ui.{IFileEditorInput, IEditorInput}
 
 class ScalaDebugModelPresentation extends IDebugModelPresentation {
 
@@ -26,7 +22,7 @@ class ScalaDebugModelPresentation extends IDebugModelPresentation {
     // TODO: the real work
     listener.detailComputed(value, null)
   }
-  
+
   def getImage(element: Any): org.eclipse.swt.graphics.Image = {
     element match {
       case target: ScalaDebugTarget =>
@@ -45,7 +41,7 @@ class ScalaDebugModelPresentation extends IDebugModelPresentation {
         ???
     }
   }
-  
+
   def getText(element: Any): String = {
     element match {
       case target: ScalaDebugTarget =>
@@ -58,7 +54,7 @@ class ScalaDebugModelPresentation extends IDebugModelPresentation {
         ???
     }
   }
-  
+
   def setAttribute(x$1: String, x$2: Any): Unit = ???
 
   // Members declared in org.eclipse.debug.ui.ISourcePresentation
@@ -71,7 +67,7 @@ class ScalaDebugModelPresentation extends IDebugModelPresentation {
         null
     }
   }
-  
+
   def getEditorInput(input: Any): IEditorInput = {
     input match {
       case file: IFile =>

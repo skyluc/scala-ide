@@ -1,7 +1,6 @@
 package scala.tools.eclipse.debug
 
-import com.sun.jdi.AbsentInformationException
-import com.sun.jdi.Method
+import com.sun.jdi.{Method, AbsentInformationException}
 
 object JDIUtil {
 
@@ -10,7 +9,7 @@ object JDIUtil {
    */
   def methodToLines(m: Method) = {
     import scala.collection.JavaConverters._
-    
+
     try {
       m.allLineLocations.asScala.map(_.lineNumber)
     } catch {

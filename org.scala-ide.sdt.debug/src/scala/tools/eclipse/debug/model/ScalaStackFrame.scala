@@ -1,13 +1,15 @@
-package scala.tools.eclipse.debug
+package scala.tools.eclipse.debug.model
+
+import scala.collection.JavaConverters.asScalaBufferConverter
+
+import org.eclipse.debug.core.model.IStackFrame
 
 import com.sun.jdi.StackFrame
-import org.eclipse.debug.core.model.IStackFrame
-import org.eclipse.jdt.debug.core.IJavaStackFrame
 
 class ScalaStackFrame(val thread: ScalaThread, val stackFrame: StackFrame) extends ScalaDebugElement(thread.getScalaDebugTarget) with IStackFrame {
 
   // Members declared in org.eclipse.debug.core.model.IStackFrame
-  
+
   def getCharEnd(): Int = -1
   def getCharStart(): Int = -1
   def getLineNumber(): Int = stackFrame.location.lineNumber // TODO: cache data ?
@@ -17,9 +19,9 @@ class ScalaStackFrame(val thread: ScalaThread, val stackFrame: StackFrame) exten
   def getVariables(): Array[org.eclipse.debug.core.model.IVariable] = variables.toArray // TODO: need real logic
   def hasRegisterGroups(): Boolean = ???
   def hasVariables(): Boolean = ???
-  
+
   // Members declared in org.eclipse.debug.core.model.IStep
-  
+
   def canStepInto(): Boolean = false // TODO: need real logic
   def canStepOver(): Boolean = true // TODO: need real logic
   def canStepReturn(): Boolean = false // TODO: need real logic
@@ -27,24 +29,24 @@ class ScalaStackFrame(val thread: ScalaThread, val stackFrame: StackFrame) exten
   def stepInto(): Unit = ???
   def stepOver(): Unit = thread.stepOver
   def stepReturn(): Unit = ???
-  
+
   // Members declared in org.eclipse.debug.core.model.ISuspendResume
-  
+
   def canResume(): Boolean = false // TODO: need real logic
   def canSuspend(): Boolean = false // TODO: need real logic
   def isSuspended(): Boolean = true // TODO: need real logic
   def resume(): Unit = ???
   def suspend(): Unit = ???
-  
+
   // ---
-  
+
   fireCreationEvent
-  
+
   val variables = {
     import scala.collection.JavaConverters._
     stackFrame.visibleVariables.asScala.map(new ScalaLocalVariable(_, this))
   }
-  
+
   def getSourceName(): String = stackFrame.location.sourceName
 
 }

@@ -95,12 +95,6 @@
             id="org.scala-ide.sdt.core.properties.Logging"
             name="Logging">
       </page>
-      <page
-            category="org.scala-ide.sdt.core.preferences"
-            class="scala.tools.eclipse.properties.DebugPreferencePage"
-            id="org.scala-ide.sdt.debug.preferences"
-            name="Debug">
-      </page>      
    </extension>
 
 
@@ -759,9 +753,6 @@
      <initializer
            class="scala.tools.eclipse.logging.ui.properties.LoggingPreferencePageInitializer">
      </initializer>
-     <initializer
-           class="scala.tools.eclipse.properties.DebugPreferenceInitializer">
-     </initializer>
   </extension>
 
   <extension point="org.eclipse.core.expressions.propertyTesters">
@@ -1280,12 +1271,5 @@
           </with>
        </enablement>
     </moveParticipant>
- </extension>
- <extension
-       point="org.eclipse.debug.ui.debugModelPresentations">
-    <debugModelPresentation
-          class="scala.tools.eclipse.debug.ScalaDebugModelPresentation"
-          id="org.scala-ide.sdt.debug">
-    </debugModelPresentation>
  </extension>
 </plugin>
