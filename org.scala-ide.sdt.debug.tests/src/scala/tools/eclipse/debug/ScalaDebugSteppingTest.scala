@@ -1,10 +1,11 @@
 package scala.tools.eclipse.debug
 
 import scala.tools.eclipse.testsetup.TestProjectSetup
-
 import org.junit.{Test, Before, After}
+import org.eclipse.core.resources.IncrementalProjectBuilder
+import org.eclipse.core.runtime.NullProgressMonitor
 
-object ScalaDebugSteppingTest extends TestProjectSetup("debug") {
+object ScalaDebugSteppingTest extends TestProjectSetup("debug", bundleName= "org.scala-ide.sdt.debug.tests") {
 
   val TYPENAME_FC_LS = "stepping.ForComprehensionListString"
   val TYPENAME_FC_LS2 = "stepping.ForComprehensionListString2"
@@ -23,6 +24,12 @@ class ScalaDebugSteppingTest {
   @Before
   def setScalaDebugMode() {
     ScalaDebugPlugin.plugin.getPreferenceStore.setValue(DebugPreferencePage.P_ENABLE, true)
+  }
+  
+  @Before
+  def refreshBinaryFiles() {
+    project.underlying.build(IncrementalProjectBuilder.CLEAN_BUILD, new NullProgressMonitor)
+    project.underlying.build(IncrementalProjectBuilder.INCREMENTAL_BUILD, new NullProgressMonitor)
   }
 
   @After
