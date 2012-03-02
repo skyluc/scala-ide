@@ -1,10 +1,9 @@
 package scala.tools.eclipse.debug.model
 
 import scala.collection.JavaConverters.asScalaBufferConverter
-
 import org.eclipse.debug.core.model.IStackFrame
-
 import com.sun.jdi.StackFrame
+import com.sun.jdi.AbsentInformationException
 
 class ScalaStackFrame(val thread: ScalaThread, val stackFrame: StackFrame) extends ScalaDebugElement(thread.getScalaDebugTarget) with IStackFrame {
 
@@ -42,9 +41,13 @@ class ScalaStackFrame(val thread: ScalaThread, val stackFrame: StackFrame) exten
 
   fireCreationEvent
 
-  val variables = {
+  val variables: Seq[ScalaLocalVariable] = {
     import scala.collection.JavaConverters._
-    stackFrame.visibleVariables.asScala.map(new ScalaLocalVariable(_, this))
+    try {
+      stackFrame.visibleVariables.asScala.map(new ScalaLocalVariable(_, this))
+    } catch {
+      case e: AbsentInformationException => Seq()
+    }
   }
 
   def getSourceName(): String = stackFrame.location.sourceName
