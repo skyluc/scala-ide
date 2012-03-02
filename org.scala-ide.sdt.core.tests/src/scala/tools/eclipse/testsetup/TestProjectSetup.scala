@@ -26,11 +26,11 @@ import org.eclipse.core.resources.IFile
  *  Example: `object HyperlinkDetectorTests extends TestProjectSetup("hyperlinks")'
  * 
  */
-class TestProjectSetup(projectName: String, srcRoot: String = "/%s/src/") extends ProjectBuilder {
+class TestProjectSetup(projectName: String, srcRoot: String = "/%s/src/", bundleName: String = "org.scala-ide.sdt.core.tests") extends ProjectBuilder {
   type ScalaUnit = ScalaCompilationUnit with ICompilationUnit
   
   /** The ScalaProject corresponding to projectName, after copying to the test workspace. */
-  lazy val project: ScalaProject = SDTTestUtils.setupProject(projectName)
+  lazy val project: ScalaProject = SDTTestUtils.setupProject(projectName, bundleName)
   
   /** The package root corresponding to /src inside the project. */
   lazy val srcPackageRoot: IPackageFragmentRoot = {
