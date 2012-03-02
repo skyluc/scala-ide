@@ -94,7 +94,7 @@
             class="scala.tools.eclipse.logging.ui.properties.LoggingPreferencePage"
             id="org.scala-ide.sdt.core.properties.Logging"
             name="Logging">
-      </page>
+      </page>      
    </extension>
 
 
@@ -232,7 +232,7 @@
          tooltip="Report a bug in the Scala Development Tools"
          class="scala.tools.eclipse.actions.RunDiagnosticAction"
          enablesFor="*">
-       </action>
+       </action>       
      </actionSet>
    </extension>
 
@@ -252,7 +252,8 @@
                style="toggle"
                toolbarPath="Normal/Presentation"
                tooltip="Show inferred semicolons">
-        </action>        
+        </action>
+
       </actionSet>
    </extension>
 
