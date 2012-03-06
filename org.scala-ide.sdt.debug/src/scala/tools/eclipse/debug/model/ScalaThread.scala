@@ -2,10 +2,9 @@ package scala.tools.eclipse.debug.model
 
 import scala.collection.JavaConverters.asScalaBufferConverter
 import scala.tools.eclipse.debug.command.{ScalaStepOver, ScalaStep}
-
 import org.eclipse.debug.core.model.{IThread, IBreakpoint}
-
 import com.sun.jdi.ThreadReference
+import com.sun.jdi.VMDisconnectedException
 
 class ScalaThread(target: ScalaDebugTarget, val thread: ThreadReference) extends ScalaDebugElement(target) with IThread {
 
@@ -36,7 +35,17 @@ class ScalaThread(target: ScalaDebugTarget, val thread: ThreadReference) extends
   // Members declared in org.eclipse.debug.core.model.IThread
 
   def getBreakpoints(): Array[IBreakpoint] = Array() // TODO: need real logic
-  def getName(): String = thread.name
+  
+  def getName(): String = {
+    try {
+      name= thread.name
+    } catch {
+      case e: VMDisconnectedException =>
+        name= "<disconnected>"
+    }
+    name
+  }
+  
   def getPriority(): Int = ???
   def getStackFrames(): Array[org.eclipse.debug.core.model.IStackFrame] = stackFrames.toArray
   def getTopStackFrame(): org.eclipse.debug.core.model.IStackFrame = stackFrames.find(sf => true).getOrElse(null)
@@ -44,13 +53,18 @@ class ScalaThread(target: ScalaDebugTarget, val thread: ThreadReference) extends
 
   // ----
 
+  // state
   var suspended = thread.isSuspended
-
-  var currentStep: Option[ScalaStep] = None
 
   var stackFrames: List[ScalaStackFrame] = Nil
 
+  // initialize name
+  var name: String= null
+  
   fireCreationEvent
+  
+  // step management
+  var currentStep: Option[ScalaStep] = None
 
   def suspendedFromJava(eventDetail: Int) {
     import scala.collection.JavaConverters._
