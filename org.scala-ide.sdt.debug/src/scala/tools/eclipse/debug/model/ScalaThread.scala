@@ -5,6 +5,7 @@ import scala.tools.eclipse.debug.command.{ScalaStepOver, ScalaStep}
 import org.eclipse.debug.core.model.{IThread, IBreakpoint}
 import com.sun.jdi.ThreadReference
 import com.sun.jdi.VMDisconnectedException
+import com.sun.jdi.ObjectCollectedException
 
 class ScalaThread(target: ScalaDebugTarget, val thread: ThreadReference) extends ScalaDebugElement(target) with IThread {
 
@@ -40,6 +41,8 @@ class ScalaThread(target: ScalaDebugTarget, val thread: ThreadReference) extends
     try {
       name= thread.name
     } catch {
+      case e: ObjectCollectedException =>
+        name= "<garbage collected>"
       case e: VMDisconnectedException =>
         name= "<disconnected>"
     }
