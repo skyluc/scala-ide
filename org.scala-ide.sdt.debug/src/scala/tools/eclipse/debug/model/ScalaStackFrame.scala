@@ -4,8 +4,59 @@ import scala.collection.JavaConverters.asScalaBufferConverter
 import org.eclipse.debug.core.model.IStackFrame
 import com.sun.jdi.StackFrame
 import com.sun.jdi.AbsentInformationException
+import com.sun.jdi.Method
+import com.sun.jdi.Type
+import com.sun.jdi.ReferenceType
+import com.sun.jdi.BooleanType
+import com.sun.jdi.ByteType
+import com.sun.jdi.CharType
+import com.sun.jdi.DoubleType
+import com.sun.jdi.IntegerType
+import com.sun.jdi.FloatType
+import com.sun.jdi.LongType
+import com.sun.jdi.ShortType
+import com.sun.jdi.ArrayType
+
+object ScalaStackFrame {
+  
+  def getSimpleName(tpe: Type): String = {
+    tpe match {
+      case booleanType: BooleanType =>
+        "Boolean"
+      case byteType: ByteType =>
+        "Byte"
+      case charType: CharType =>
+        "Char"
+      case doubleType: DoubleType =>
+        "Double"
+      case floatType: FloatType =>
+        "Float"
+      case intType: IntegerType =>
+        "Int"
+      case longType: LongType =>
+        "Long"
+      case shortType: ShortType =>
+        "Short"
+      case arrayType: ArrayType =>
+        "Array[%s]".format(getSimpleName(arrayType.componentType))
+      case refType: ReferenceType =>
+        refType.name.split('.').last
+      case _ =>
+        ???
+    }
+  }
+  
+  def getFullName(method: Method): String = {
+    import scala.collection.JavaConverters._
+    "%s.%s(%s)".format(
+        getSimpleName(method.declaringType),
+        method.name,
+        method.argumentTypes.asScala.map(getSimpleName(_)).mkString(", "))
+  }
+}
 
 class ScalaStackFrame(val thread: ScalaThread, val stackFrame: StackFrame) extends ScalaDebugElement(thread.getScalaDebugTarget) with IStackFrame {
+  import ScalaStackFrame._
 
   // Members declared in org.eclipse.debug.core.model.IStackFrame
 
@@ -51,5 +102,9 @@ class ScalaStackFrame(val thread: ScalaThread, val stackFrame: StackFrame) exten
   }
 
   def getSourceName(): String = stackFrame.location.sourceName
+  
+  def getMethodFullName(): String = {
+    getFullName(stackFrame.location.method)
+  }
 
 }

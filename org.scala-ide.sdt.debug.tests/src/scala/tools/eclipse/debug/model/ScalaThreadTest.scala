@@ -16,7 +16,9 @@ class ScalaThreadTest {
   
   @Before
   def initializeDebugPlugin() {
-    new DebugPlugin
+    if (DebugPlugin.getDefault == null) {
+      new DebugPlugin
+    }
   }
   
   @Test

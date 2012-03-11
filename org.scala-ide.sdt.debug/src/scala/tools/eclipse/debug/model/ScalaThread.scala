@@ -62,7 +62,11 @@ class ScalaThread(target: ScalaDebugTarget, val thread: ThreadReference) extends
   var stackFrames: List[ScalaStackFrame] = Nil
 
   // initialize name
-  var name: String= null
+  private var name: String= null
+
+  val isSystemThread: Boolean= {
+    thread.threadGroup.name == "system"
+  }
   
   fireCreationEvent
   
@@ -91,5 +95,8 @@ class ScalaThread(target: ScalaDebugTarget, val thread: ThreadReference) extends
     stackFrames = Nil
     fireResumeEvent(eventDetail)
   }
+  
+  // ----
+  
 
 }

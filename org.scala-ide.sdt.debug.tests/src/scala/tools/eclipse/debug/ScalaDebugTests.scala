@@ -4,6 +4,8 @@ import junit.framework.TestSuite
 import org.junit.runners.Suite
 import org.junit.runner.RunWith
 import scala.tools.eclipse.debug.model.ScalaThreadTest
+import scala.tools.eclipse.debug.model.ScalaDebugModelPresentationTest
+import scala.tools.eclipse.debug.model.ScalaStackFrameTest
 
 /**
  * Junit test suite for the Scala debugger.
@@ -13,6 +15,8 @@ import scala.tools.eclipse.debug.model.ScalaThreadTest
 @Suite.SuiteClasses(
   Array(
     classOf[ScalaDebugSteppingTest],
-    classOf[ScalaThreadTest]))
+    classOf[ScalaThreadTest],
+    classOf[ScalaDebugModelPresentationTest],
+    classOf[ScalaStackFrameTest]))
 class ScalaDebugTestSuite {
 }
