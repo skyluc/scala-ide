@@ -103,6 +103,7 @@ object ScalaStackFrameTest {
 
 }
 
+// TODO: add test about returning the list of variables, including 'this'
 class ScalaStackFrameTest {
   
   import ScalaStackFrameTest._

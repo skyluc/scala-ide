@@ -92,12 +92,13 @@ class ScalaStackFrame(val thread: ScalaThread, val stackFrame: StackFrame) exten
 
   fireCreationEvent
 
-  val variables: Seq[ScalaLocalVariable] = {
+  val variables: Seq[ScalaVariable] = {
     import scala.collection.JavaConverters._
+    val thisVariable= new ScalaThisVariable(stackFrame.thisObject, this)
     try {
-      stackFrame.visibleVariables.asScala.map(new ScalaLocalVariable(_, this))
+      thisVariable +: stackFrame.visibleVariables.asScala.map(new ScalaLocalVariable(_, this))
     } catch {
-      case e: AbsentInformationException => Seq()
+      case e: AbsentInformationException => Seq(thisVariable)
     }
   }
 
