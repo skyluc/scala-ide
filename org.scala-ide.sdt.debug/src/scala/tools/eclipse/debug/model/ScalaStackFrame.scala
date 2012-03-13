@@ -94,11 +94,15 @@ class ScalaStackFrame(val thread: ScalaThread, val stackFrame: StackFrame) exten
 
   val variables: Seq[ScalaVariable] = {
     import scala.collection.JavaConverters._
-    val thisVariable= new ScalaThisVariable(stackFrame.thisObject, this)
-    try {
-      thisVariable +: stackFrame.visibleVariables.asScala.map(new ScalaLocalVariable(_, this))
+    val visibleVariables= try {
+      stackFrame.visibleVariables.asScala.map(new ScalaLocalVariable(_, this))
     } catch {
-      case e: AbsentInformationException => Seq(thisVariable)
+      case e: AbsentInformationException => Seq()
+    }
+    if (stackFrame.location.method.isStatic) {
+      visibleVariables
+    } else {
+      new ScalaThisVariable(stackFrame.thisObject, this) +: visibleVariables
     }
   }
 

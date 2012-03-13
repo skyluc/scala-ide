@@ -21,6 +21,7 @@ import com.sun.jdi.IntegerType
 import com.sun.jdi.LongType
 import com.sun.jdi.ShortType
 import com.sun.jdi.ArrayType
+import com.sun.jdi.LocalVariable
 
 object ScalaStackFrameTest {
 
@@ -103,7 +104,6 @@ object ScalaStackFrameTest {
 
 }
 
-// TODO: add test about returning the list of variables, including 'this'
 class ScalaStackFrameTest {
   
   import ScalaStackFrameTest._
@@ -267,6 +267,57 @@ class ScalaStackFrameTest {
     val scalaStackFrame = new ScalaStackFrame(scalaThread, jdiStackFrame)
 
     assertEquals("Bad full method name", "TypeName.methodName(Boolean, Array[Int], Float, SomeTypeA, Array[Array[SomeTypeB]])", scalaStackFrame.getMethodFullName)
+  }
+  
+  @Test
+  def getVariableNonStaticMethod() {
+    import scala.collection.JavaConverters._
+    
+    val scalaThread = mock(classOf[ScalaThread])
+    
+    val jdiStackFrame = mock(classOf[StackFrame])
+    val jdiLocation = mock(classOf[Location])
+    when(jdiStackFrame.location).thenReturn(jdiLocation)
+    val jdiMethod = mock(classOf[Method])
+    when(jdiLocation.method).thenReturn(jdiMethod)
+    when(jdiMethod.isStatic).thenReturn(false)
+    val jdiLocalVariable = mock(classOf[LocalVariable])
+    when(jdiStackFrame.visibleVariables).thenReturn(List(jdiLocalVariable, jdiLocalVariable, jdiLocalVariable, jdiLocalVariable).asJava)
+
+    val scalaStackFrame = new ScalaStackFrame(scalaThread, jdiStackFrame)
+    
+    val variables= scalaStackFrame.getVariables
+    
+    assertEquals("Bad number of variables", 5, variables.length)
+    assertTrue("Bad type for 'this'", variables.head.isInstanceOf[ScalaThisVariable])
+    variables.tail.foreach {v =>
+      assertTrue("Bad local variable type", v.isInstanceOf[ScalaLocalVariable])
+    }
+  }
+  
+  @Test
+  def getVariableStaticMethod() {
+    import scala.collection.JavaConverters._
+    
+    val scalaThread = mock(classOf[ScalaThread])
+    
+    val jdiStackFrame = mock(classOf[StackFrame])
+    val jdiLocation = mock(classOf[Location])
+    when(jdiStackFrame.location).thenReturn(jdiLocation)
+    val jdiMethod = mock(classOf[Method])
+    when(jdiLocation.method).thenReturn(jdiMethod)
+    when(jdiMethod.isStatic).thenReturn(true)
+    val jdiLocalVariable = mock(classOf[LocalVariable])
+    when(jdiStackFrame.visibleVariables).thenReturn(List(jdiLocalVariable, jdiLocalVariable, jdiLocalVariable).asJava)
+
+    val scalaStackFrame = new ScalaStackFrame(scalaThread, jdiStackFrame)
+    
+    val variables= scalaStackFrame.getVariables
+    
+    assertEquals("Bad number of variables", 3, variables.length)
+    variables.foreach {v =>
+      assertTrue("Bad local variable type", v.isInstanceOf[ScalaLocalVariable])
+    }
   }
 
 }
