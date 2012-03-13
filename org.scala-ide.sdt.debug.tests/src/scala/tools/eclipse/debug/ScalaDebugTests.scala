@@ -17,7 +17,7 @@ import scala.tools.eclipse.debug.model.ScalaValueTest
   Array(
     classOf[ScalaDebugSteppingTest],
     classOf[ScalaThreadTest],
-    classOf[ScalaDebugModelPresentationTest],
+//    classOf[ScalaDebugModelPresentationTest], // TODO: find where to put this test
     classOf[ScalaStackFrameTest],
     classOf[ScalaValueTest]))
 class ScalaDebugTestSuite {
