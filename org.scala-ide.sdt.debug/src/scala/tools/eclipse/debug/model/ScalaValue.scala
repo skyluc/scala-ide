@@ -57,8 +57,8 @@ class ScalaArrayReference(val arrayReference: ArrayReference, target: ScalaDebug
 
   // Members declared in org.eclipse.debug.core.model.IValue
 
-  def getReferenceTypeName(): String = arrayReference.`type`.name
-  def getValueString(): String = "an array" // TODO: need real value
+  def getReferenceTypeName(): String = "scala.Array"
+  def getValueString(): String = "%s(%d) (id=%d)".format(ScalaStackFrame.getSimpleName(arrayReference.referenceType), arrayReference.length, arrayReference.uniqueID) // TODO: need real value
   def getVariables(): Array[org.eclipse.debug.core.model.IVariable] = {
     (0 until arrayReference.length).map(new ScalaArrayVariable(_, this)).toArray
   }
@@ -88,7 +88,7 @@ class ScalaObjectReference(val objectReference: ObjectReference, target: ScalaDe
   // Members declared in org.eclipse.debug.core.model.IValue
 
   def getReferenceTypeName(): String = objectReference.referenceType.name
-  def getValueString(): String = "an object" // TODO: need real value
+  def getValueString(): String = "%s (id=%d)".format(ScalaStackFrame.getSimpleName(objectReference.referenceType), objectReference.uniqueID) // TODO: need real value
   def getVariables(): Array[org.eclipse.debug.core.model.IVariable] = {
     import scala.collection.JavaConverters._
     objectReference.referenceType.allFields.asScala.map(new ScalaFieldVariable(_, this)).toArray
