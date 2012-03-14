@@ -82,10 +82,10 @@ class ScalaStackFrame(val thread: ScalaThread, val stackFrame: StackFrame) exten
 
   // Members declared in org.eclipse.debug.core.model.ISuspendResume
 
-  def canResume(): Boolean = false // TODO: need real logic
-  def canSuspend(): Boolean = false // TODO: need real logic
-  def isSuspended(): Boolean = true // TODO: need real logic
-  def resume(): Unit = ???
+  def canResume(): Boolean = true
+  def canSuspend(): Boolean = false
+  def isSuspended(): Boolean = true
+  def resume(): Unit = thread.resume
   def suspend(): Unit = ???
 
   // ---

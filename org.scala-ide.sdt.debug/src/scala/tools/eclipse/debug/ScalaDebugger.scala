@@ -83,7 +83,8 @@ object ScalaDebugger extends IDebugEventSetListener with ISelectionListener {
   def init() {
     DebugPlugin.getDefault.addDebugEventListener(this)
     // TODO: really ugly. Need to keep track of current selection per window.
-    WorkbenchPlugin.getDefault.getWorkbench.getWorkbenchWindows.apply(0).getSelectionService.addSelectionListener("org.eclipse.debug.ui.DebugView", this)
+    // TODO: disable during headless tests
+    //WorkbenchPlugin.getDefault.getWorkbench.getWorkbenchWindows.apply(0).getSelectionService.addSelectionListener("org.eclipse.debug.ui.DebugView", this)
   }
 
   private def javaDebugTargetCreated(target: JDIDebugTarget) {
