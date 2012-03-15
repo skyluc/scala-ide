@@ -60,7 +60,7 @@ class ScalaArrayReference(val arrayReference: ArrayReference, target: ScalaDebug
   def getReferenceTypeName(): String = "scala.Array"
   def getValueString(): String = "%s(%d) (id=%d)".format(ScalaStackFrame.getSimpleName(arrayReference.referenceType), arrayReference.length, arrayReference.uniqueID) // TODO: need real value
   def getVariables(): Array[org.eclipse.debug.core.model.IVariable] = {
-    (0 until arrayReference.length).map(new ScalaArrayVariable(_, this)).toArray
+    (0 until arrayReference.length).map(new ScalaArrayElementVariable(_, this)).toArray
   }
   def hasVariables(): Boolean = arrayReference.length > 0
 }
