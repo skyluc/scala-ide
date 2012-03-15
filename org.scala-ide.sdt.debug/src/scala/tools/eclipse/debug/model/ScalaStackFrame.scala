@@ -16,6 +16,7 @@ import com.sun.jdi.FloatType
 import com.sun.jdi.LongType
 import com.sun.jdi.ShortType
 import com.sun.jdi.ArrayType
+import scala.reflect.NameTransformer
 
 object ScalaStackFrame {
   
@@ -40,7 +41,7 @@ object ScalaStackFrame {
       case arrayType: ArrayType =>
         "Array[%s]".format(getSimpleName(arrayType.componentType))
       case refType: ReferenceType =>
-        refType.name.split('.').last
+        NameTransformer.decode(refType.name.split('.').last)
       case _ =>
         ???
     }
@@ -50,7 +51,7 @@ object ScalaStackFrame {
     import scala.collection.JavaConverters._
     "%s.%s(%s)".format(
         getSimpleName(method.declaringType),
-        method.name,
+        NameTransformer.decode(method.name),
         method.argumentTypes.asScala.map(getSimpleName(_)).mkString(", "))
   }
 }
