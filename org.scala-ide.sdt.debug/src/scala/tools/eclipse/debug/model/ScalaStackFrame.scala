@@ -55,7 +55,7 @@ object ScalaStackFrame {
   }
 }
 
-class ScalaStackFrame(val thread: ScalaThread, val stackFrame: StackFrame) extends ScalaDebugElement(thread.getScalaDebugTarget) with IStackFrame {
+class ScalaStackFrame(val thread: ScalaThread, var stackFrame: StackFrame) extends ScalaDebugElement(thread.getScalaDebugTarget) with IStackFrame {
   import ScalaStackFrame._
 
   // Members declared in org.eclipse.debug.core.model.IStackFrame
@@ -110,6 +110,10 @@ class ScalaStackFrame(val thread: ScalaThread, val stackFrame: StackFrame) exten
   
   def getMethodFullName(): String = {
     getFullName(stackFrame.location.method)
+  }
+  
+  def rebind(newStackFrame: StackFrame) {
+    stackFrame= newStackFrame
   }
 
 }

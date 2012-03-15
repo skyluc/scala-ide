@@ -76,7 +76,7 @@ class ScalaPrimitiveValue(typeName: String, value: String, target: ScalaDebugTar
 
 }
 
-class ScalaStringReference(stringReference: StringReference, target: ScalaDebugTarget) extends ScalaObjectReference(stringReference, target) {
+class ScalaStringReference(val stringReference: StringReference, target: ScalaDebugTarget) extends ScalaObjectReference(stringReference, target) {
 
   override def getReferenceTypeName() = "java.lang.String"
   override def getValueString(): String = """"%s" (id=%d)""".format(stringReference.value, stringReference.uniqueID)
