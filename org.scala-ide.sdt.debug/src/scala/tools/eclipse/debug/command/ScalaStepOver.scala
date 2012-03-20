@@ -4,17 +4,17 @@ import scala.Option.option2Iterable
 import scala.collection.JavaConverters.asScalaBufferConverter
 import scala.collection.mutable.Buffer
 import scala.tools.eclipse.debug.JDIUtil.methodToLines
-import scala.tools.eclipse.debug.model.{ScalaThread, ScalaStackFrame, ScalaDebugTarget}
+import scala.tools.eclipse.debug.model.{ ScalaThread, ScalaStackFrame, ScalaDebugTarget }
 
 import org.eclipse.debug.core.DebugEvent
 import org.eclipse.jdt.internal.debug.core.model.JDIDebugTarget
 import org.eclipse.jdt.internal.debug.core.IJDIEventListener
 
-import com.sun.jdi.event.{StepEvent, EventSet, Event, ClassPrepareEvent, BreakpointEvent}
-import com.sun.jdi.request.{StepRequest, EventRequest, ClassPrepareRequest, BreakpointRequest}
-import com.sun.jdi.{ThreadReference, ReferenceType, Method}
+import com.sun.jdi.event.{ StepEvent, EventSet, Event, ClassPrepareEvent, BreakpointEvent }
+import com.sun.jdi.request.{ StepRequest, EventRequest, ClassPrepareRequest, BreakpointRequest }
+import com.sun.jdi.{ ThreadReference, ReferenceType, Method }
 
-import ScalaStepOver.{createMethodEntryBreakpoint, anonFunctionsInRange}
+import ScalaStepOver.{ createMethodEntryBreakpoint, anonFunctionsInRange }
 
 object ScalaStepOver {
 
@@ -86,7 +86,8 @@ object ScalaStepOver {
 
 class ScalaStepOver(target: ScalaDebugTarget, range: Range, thread: ScalaThread, classPrepareRequest: ClassPrepareRequest, stepOverRequest: StepRequest, entryBreakpoints: Buffer[BreakpointRequest]) extends IJDIEventListener with ScalaStep {
   import ScalaStepOver._
-  /* from IJDIEventListener */
+
+  // Members declared in org.eclipse.jdt.internal.debug.core.IJDIEventListener
 
   def eventSetComplete(event: Event, target: JDIDebugTarget, suspend: Boolean, eventSet: EventSet): Unit = {
     // nothing to do
@@ -119,7 +120,7 @@ class ScalaStepOver(target: ScalaDebugTarget, range: Range, thread: ScalaThread,
     }
   }
 
-  // ----
+  // Members declared in scala.tools.eclipse.debug.command.ScalaStep
 
   def step() {
     val eventDispatcher = target.javaTarget.getEventDispatcher

@@ -19,7 +19,7 @@ import com.sun.jdi.ArrayType
 import scala.reflect.NameTransformer
 
 object ScalaStackFrame {
-  
+
   def getSimpleName(tpe: Type): String = {
     tpe match {
       case booleanType: BooleanType =>
@@ -46,13 +46,13 @@ object ScalaStackFrame {
         ???
     }
   }
-  
+
   def getFullName(method: Method): String = {
     import scala.collection.JavaConverters._
     "%s.%s(%s)".format(
-        getSimpleName(method.declaringType),
-        NameTransformer.decode(method.name),
-        method.argumentTypes.asScala.map(getSimpleName(_)).mkString(", "))
+      getSimpleName(method.declaringType),
+      NameTransformer.decode(method.name),
+      method.argumentTypes.asScala.map(getSimpleName(_)).mkString(", "))
   }
 }
 
@@ -73,13 +73,13 @@ class ScalaStackFrame(val thread: ScalaThread, var stackFrame: StackFrame) exten
 
   // Members declared in org.eclipse.debug.core.model.IStep
 
-  def canStepInto(): Boolean = false // TODO: need real logic
+  def canStepInto(): Boolean = true // TODO: need real logic
   def canStepOver(): Boolean = true // TODO: need real logic
-  def canStepReturn(): Boolean = false // TODO: need real logic
+  def canStepReturn(): Boolean = true // TODO: need real logic
   def isStepping(): Boolean = ???
-  def stepInto(): Unit = ???
+  def stepInto(): Unit = thread.stepInto
   def stepOver(): Unit = thread.stepOver
-  def stepReturn(): Unit = ???
+  def stepReturn(): Unit = thread.stepReturn
 
   // Members declared in org.eclipse.debug.core.model.ISuspendResume
 
@@ -95,7 +95,7 @@ class ScalaStackFrame(val thread: ScalaThread, var stackFrame: StackFrame) exten
 
   val variables: Seq[ScalaVariable] = {
     import scala.collection.JavaConverters._
-    val visibleVariables= try {
+    val visibleVariables = try {
       stackFrame.visibleVariables.asScala.map(new ScalaLocalVariable(_, this))
     } catch {
       case e: AbsentInformationException => Seq()
@@ -108,13 +108,13 @@ class ScalaStackFrame(val thread: ScalaThread, var stackFrame: StackFrame) exten
   }
 
   def getSourceName(): String = stackFrame.location.sourceName
-  
+
   def getMethodFullName(): String = {
     getFullName(stackFrame.location.method)
   }
-  
+
   def rebind(newStackFrame: StackFrame) {
-    stackFrame= newStackFrame
+    stackFrame = newStackFrame
   }
 
 }
