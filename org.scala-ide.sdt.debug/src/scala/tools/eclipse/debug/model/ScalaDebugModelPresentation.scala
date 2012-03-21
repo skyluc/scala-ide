@@ -27,6 +27,7 @@ import org.eclipse.core.runtime.IStatus
 import org.eclipse.core.runtime.Status
 import scala.tools.eclipse.debug.ScalaDebugPlugin
 import com.sun.jdi.PrimitiveValue
+import org.eclipse.jdt.internal.ui.javaeditor.EditorUtility
 
 object ScalaDebugModelPresentation {
   def computeDetail(value: IValue): String = {
@@ -164,21 +165,11 @@ class ScalaDebugModelPresentation extends IDebugModelPresentation {
   // Members declared in org.eclipse.debug.ui.ISourcePresentation
 
   def getEditorId(input: IEditorInput, element: Any): String = {
-    input match {
-      case fileInput: IFileEditorInput =>
-        IDE.getEditorDescriptor(fileInput.getFile).getId
-      case _ =>
-        null
-    }
+    EditorUtility.getEditorID(input)
   }
 
   def getEditorInput(input: Any): IEditorInput = {
-    input match {
-      case file: IFile =>
-        new FileEditorInput(file)
-      case _ =>
-        ???
-    }
+    EditorUtility.getEditorInput(input)
   }
 
   // ----
