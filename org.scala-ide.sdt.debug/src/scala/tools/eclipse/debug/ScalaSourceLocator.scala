@@ -27,7 +27,7 @@ class ScalaSourceLocator(launch: ILaunch) extends ISourceLocator {
   }
 
   def getSourceElement(stackFrame: ScalaStackFrame): AnyRef = {
-//    val sourceName = stackFrame.getSourceName
+    val sourceName = stackFrame.getSourceName
     
     val attributes = launch.getLaunchConfiguration.getAttributes
 
@@ -43,13 +43,14 @@ class ScalaSourceLocator(launch: ILaunch) extends ISourceLocator {
       workspacePlugins.flatMap(s => ScalaPlugin.plugin.asScalaProject(ResourcesPlugin.getWorkspace.getRoot.getProject(s.substring(0, s.indexOf('@'))))).toList
     }
     
-    // TODO: goes through all project instead of stopping at the first occurrence
-    val t = scalaProjects.flatMap(findType(_, stackFrame.stackFrame.location.declaringType.name))
-    t.headOption.getOrElse(null)
+    val typeName= stackFrame.stackFrame.location.declaringType.name
+    
+    scalaProjects.foldLeft(None.asInstanceOf[Option[AnyRef]])((b: Option[AnyRef], a: ScalaProject) => b.orElse(findElement(a, typeName, sourceName))).getOrElse(null)
   }
   
-  def findType(project: ScalaProject, typeName: String) : Option[IType] = {
-    Some(project.javaProject.findType(typeName))
+  // TODO: it is looking only for the right source name, may need to guess the package first
+  def findElement(project: ScalaProject, typeName: String, sourceName: String) : Option[AnyRef] = {
+    project.allSourceFiles.find(_.getName == sourceName).orElse(Some(project.javaProject.findType(typeName)))
   }
 
 }
