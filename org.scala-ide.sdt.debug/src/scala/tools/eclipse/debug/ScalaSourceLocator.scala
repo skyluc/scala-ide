@@ -45,12 +45,14 @@ class ScalaSourceLocator(launch: ILaunch) extends ISourceLocator {
     
     val typeName= stackFrame.stackFrame.location.declaringType.name
     
-    scalaProjects.foldLeft(None.asInstanceOf[Option[AnyRef]])((b: Option[AnyRef], a: ScalaProject) => b.orElse(findElement(a, typeName, sourceName))).getOrElse(null)
+    scalaProjects.foldLeft(None.asInstanceOf[Option[AnyRef]])((b: Option[AnyRef], a: ScalaProject) =>
+      b.orElse(
+          findElement(a, typeName, sourceName))).getOrElse(null)
   }
   
   // TODO: it is looking only for the right source name, may need to guess the package first
   def findElement(project: ScalaProject, typeName: String, sourceName: String) : Option[AnyRef] = {
-    project.allSourceFiles.find(_.getName == sourceName).orElse(Some(project.javaProject.findType(typeName)))
+    project.allSourceFiles.find(_.getName == sourceName).orElse(Option(project.javaProject.findType(typeName)))
   }
 
 }
