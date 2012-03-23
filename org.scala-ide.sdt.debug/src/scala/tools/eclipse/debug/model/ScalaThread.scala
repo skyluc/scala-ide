@@ -41,8 +41,8 @@ class ScalaThread(target: ScalaDebugTarget, val thread: ThreadReference) extends
   def canSuspend(): Boolean = false // TODO: need real logic
   def isSuspended(): Boolean = suspended // TODO: need real logic
   def resume(): Unit = {
-    resumedFromScala(DebugEvent.RESUME)
     thread.resume
+    resumedFromScala(DebugEvent.CLIENT_REQUEST)
   }
   def suspend(): Unit = ???
 
@@ -78,7 +78,7 @@ class ScalaThread(target: ScalaDebugTarget, val thread: ThreadReference) extends
   private var name: String = null
 
   val isSystemThread: Boolean = try {
-    thread.threadGroup.name == "system"
+    Option(thread.threadGroup).exists(_.name == "system")
   } catch {
     case e: VMDisconnectedException =>
       // some thread get created when a program terminates, and connection already closed
