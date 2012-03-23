@@ -65,7 +65,7 @@ class ScalaDebugModelPresentationTest {
 
     import ScalaStackFrameTest._
 
-    val jdiStackFrame = createJDIStackFrame("some.package.TypeName", "methodName", List(referenceType("a.b.ParamType1"), referenceType("a.b.ParamType2")))
+    val jdiStackFrame = createJDIStackFrame("Lsome/package/TypeName;", "methodName", "(La/b/ParamType1;La/b/ParamType2;)V")
     val location = jdiStackFrame.location
     when(location.lineNumber).thenReturn(42)
 
@@ -80,7 +80,7 @@ class ScalaDebugModelPresentationTest {
 
     import ScalaStackFrameTest._
 
-    val jdiStackFrame = createJDIStackFrame("some.package.TypeName", "methodName", Nil)
+    val jdiStackFrame = createJDIStackFrame("Lsome/package/TypeName;", "methodName", "()V")
     val location = jdiStackFrame.location
     when(location.lineNumber).thenReturn(-1)
 

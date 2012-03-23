@@ -20,13 +20,15 @@ import scala.reflect.NameTransformer
 
 object ScalaStackFrame {
 
+  // regexp for JNI signature
   final val typeSignature = """L([^;]*);""".r
   final val arraySignature = """\[(.*)""".r
+  final val argumentsInMethodSignature = """\(([^\)]*)\).*""".r
   
   def getSimpleName(signature: String): String = {
     signature match {
       case typeSignature(typeName) =>
-        typeName.split('/').last
+        NameTransformer.decode(typeName.split('/').last)
       case arraySignature(elementSignature) =>
         "Array[%s]".format(getSimpleName(elementSignature))
       case "B" =>
@@ -38,24 +40,47 @@ object ScalaStackFrame {
       case "F" =>
         "Float"
       case "I" =>
-        "Integer"
+        "Int"
       case "J" =>
         "Long"
       case "S" =>
         "Short"
       case "Z" =>
         "Boolean"
-      case _ =>
-        ???
     }
+  }
+  
+  // TODO: need unit tests
+  def getArgumentSimpleNames(methodSignature: String): List[String] = {
+    val argumentsInMethodSignature(argString)= methodSignature
+    
+    def parseArguments(args: String) : List[String] = {
+      if (args.isEmpty) {
+        Nil
+      } else {
+        args.head match {
+          case 'L' =>
+            val typeSignatureLength= args.indexOf(';') + 1
+            getSimpleName(args.substring(0, typeSignatureLength)) +: parseArguments(args.substring(typeSignatureLength))
+          case '[' =>
+            val parsedArguments= parseArguments(args.tail)
+            "Array[%s]".format(parsedArguments.head) +: parsedArguments.tail
+          case c =>
+            getSimpleName(c.toString) +: parseArguments(args.tail)
+        }
+      }
+    }
+    
+    parseArguments(argString)
   }
 
   def getFullName(method: Method): String = {
-    import scala.collection.JavaConverters._
+//    import scala.collection.JavaConverters._
     "%s.%s(%s)".format(
       getSimpleName(method.declaringType.signature),
       NameTransformer.decode(method.name),
-      method.arguments.asScala.map(a => getSimpleName(a.signature)).mkString(", "))
+      getArgumentSimpleNames(method.signature).mkString(", "))
+//      method.arguments.asScala.map(a => getSimpleName(a.signature)).mkString(", "))
   }
 }
 
