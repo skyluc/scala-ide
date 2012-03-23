@@ -20,28 +20,31 @@ import scala.reflect.NameTransformer
 
 object ScalaStackFrame {
 
-  def getSimpleName(tpe: Type): String = {
-    tpe match {
-      case booleanType: BooleanType =>
-        "Boolean"
-      case byteType: ByteType =>
+  final val typeSignature = """L([^;]*);""".r
+  final val arraySignature = """\[(.*)""".r
+  
+  def getSimpleName(signature: String): String = {
+    signature match {
+      case typeSignature(typeName) =>
+        typeName.split('/').last
+      case arraySignature(elementSignature) =>
+        "Array[%s]".format(getSimpleName(elementSignature))
+      case "B" =>
         "Byte"
-      case charType: CharType =>
+      case "C" =>
         "Char"
-      case doubleType: DoubleType =>
+      case "D" =>
         "Double"
-      case floatType: FloatType =>
+      case "F" =>
         "Float"
-      case intType: IntegerType =>
-        "Int"
-      case longType: LongType =>
+      case "I" =>
+        "Integer"
+      case "J" =>
         "Long"
-      case shortType: ShortType =>
+      case "S" =>
         "Short"
-      case arrayType: ArrayType =>
-        "Array[%s]".format(getSimpleName(arrayType.componentType))
-      case refType: ReferenceType =>
-        NameTransformer.decode(refType.name.split('.').last)
+      case "Z" =>
+        "Boolean"
       case _ =>
         ???
     }
@@ -50,9 +53,9 @@ object ScalaStackFrame {
   def getFullName(method: Method): String = {
     import scala.collection.JavaConverters._
     "%s.%s(%s)".format(
-      getSimpleName(method.declaringType),
+      getSimpleName(method.declaringType.signature),
       NameTransformer.decode(method.name),
-      method.argumentTypes.asScala.map(getSimpleName(_)).mkString(", "))
+      method.arguments.asScala.map(a => getSimpleName(a.signature)).mkString(", "))
   }
 }
 

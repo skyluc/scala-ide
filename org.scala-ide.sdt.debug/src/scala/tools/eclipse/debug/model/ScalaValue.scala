@@ -62,7 +62,7 @@ class ScalaArrayReference(val arrayReference: ArrayReference, target: ScalaDebug
   // Members declared in org.eclipse.debug.core.model.IValue
 
   def getReferenceTypeName(): String = "scala.Array"
-  def getValueString(): String = "%s(%d) (id=%d)".format(ScalaStackFrame.getSimpleName(arrayReference.referenceType), arrayReference.length, arrayReference.uniqueID)
+  def getValueString(): String = "%s(%d) (id=%d)".format(ScalaStackFrame.getSimpleName(arrayReference.referenceType.signature), arrayReference.length, arrayReference.uniqueID)
   def getVariables(): Array[org.eclipse.debug.core.model.IVariable] = {
     (0 until arrayReference.length).map(new ScalaArrayElementVariable(_, this)).toArray
   }
@@ -97,9 +97,9 @@ class ScalaObjectReference(val objectReference: ObjectReference, target: ScalaDe
   def getValueString(): String = {
     // TODO: move to string builder?
     if (boxedPrimitiveTypes.contains(getReferenceTypeName)) {
-      "%s %s (id=%d)".format(ScalaStackFrame.getSimpleName(objectReference.referenceType), getBoxedPrimitiveValue(objectReference), objectReference.uniqueID)
+      "%s %s (id=%d)".format(ScalaStackFrame.getSimpleName(objectReference.referenceType.signature), getBoxedPrimitiveValue(objectReference), objectReference.uniqueID)
     } else {
-      "%s (id=%d)".format(ScalaStackFrame.getSimpleName(objectReference.referenceType), objectReference.uniqueID)
+      "%s (id=%d)".format(ScalaStackFrame.getSimpleName(objectReference.referenceType.signature), objectReference.uniqueID)
     }
   }
 
