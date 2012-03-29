@@ -12,6 +12,7 @@ import com.sun.jdi.ObjectReference
 import com.sun.jdi.Method
 import scala.tools.eclipse.debug.command.ScalaStepInto
 import scala.tools.eclipse.debug.command.ScalaStepReturn
+import scala.actors.Actor
 
 /**
  * TODO: kill current step when thread terminates?
@@ -67,12 +68,66 @@ class ScalaThread(target: ScalaDebugTarget, val thread: ThreadReference) extends
   def getTopStackFrame(): org.eclipse.debug.core.model.IStackFrame = stackFrames.headOption.getOrElse(null)
   def hasStackFrames(): Boolean = !stackFrames.isEmpty
 
+  // event handling actor
+
+  case class SuspendedFromJava(eventDetail: Int)
+  case class SuspendedFromScala(eventDetail: Int)
+  case class ResumedFromScala(eventDetail: Int)
+  case class InvokeMethod(objectReference: ObjectReference, method: Method, args: List[Value])
+  case class TerminatedFromScala
+
+  class EventActor extends Actor {
+
+    start
+
+    def act() {
+      loop {
+        react {
+          case SuspendedFromJava(eventDetail) =>
+            import scala.collection.JavaConverters._
+            currentStep.foreach(_.stop)
+            suspended = true
+            stackFrames = thread.frames.asScala.map(new ScalaStackFrame(ScalaThread.this, _)).toList
+            fireSuspendEvent(eventDetail)
+            reply(this)
+          case SuspendedFromScala(eventDetail) =>
+            import scala.collection.JavaConverters._
+            suspended = true
+            stackFrames = thread.frames.asScala.map(new ScalaStackFrame(ScalaThread.this, _)).toList
+            fireSuspendEvent(eventDetail)
+            reply(this)
+          case ResumedFromScala(eventDetail) =>
+            suspended = false
+            stackFrames = Nil
+            fireResumeEvent(eventDetail)
+          case InvokeMethod(objectReference, method, args) =>
+            if (!suspended) {
+              throw new Exception("Not suspended")
+            } else {
+              import scala.collection.JavaConverters._
+              val result = objectReference.invokeMethod(thread, method, args.asJava, 0)
+              // update the stack frames
+              thread.frames.asScala.iterator.zip(stackFrames.iterator).foreach(
+                v => v._2.rebind(v._1))
+              reply(result)
+            }
+          case TerminatedFromScala =>
+            stackFrames = Nil
+            fireTerminateEvent
+            exit
+        }
+      }
+    }
+  }
+
   // ----
 
   // state
   var suspended = false
 
   var stackFrames: List[ScalaStackFrame] = Nil
+
+  val actor = new EventActor
 
   // initialize name
   private var name: String = null
@@ -91,41 +146,28 @@ class ScalaThread(target: ScalaDebugTarget, val thread: ThreadReference) extends
   var currentStep: Option[ScalaStep] = None
 
   def suspendedFromJava(eventDetail: Int) {
-    import scala.collection.JavaConverters._
-    currentStep.foreach(_.stop)
-    suspended = true
-
-    stackFrames = thread.frames.asScala.map(new ScalaStackFrame(this, _)).toList
-    fireSuspendEvent(eventDetail)
+    actor !? SuspendedFromJava(eventDetail)
   }
 
   def suspendedFromScala(eventDetail: Int) {
-    import scala.collection.JavaConverters._
-    suspended = true
-
-    stackFrames = thread.frames.asScala.map(new ScalaStackFrame(this, _)).toList
-    fireSuspendEvent(eventDetail)
+    actor !? SuspendedFromScala(eventDetail)
   }
 
   def resumedFromScala(eventDetail: Int) {
-    suspended = false
-    stackFrames = Nil
-    fireResumeEvent(eventDetail)
+    actor ! ResumedFromScala(eventDetail)
   }
-
-  def updateStackFramesAfterInvocation() {
-    import scala.collection.JavaConverters._
-    thread.frames.asScala.iterator.zip(stackFrames.iterator).foreach(
-      v => v._2.rebind(v._1))
+  
+  def terminatedFromScala() {
+    actor ! TerminatedFromScala
   }
-
-  // ----
 
   def invokeMethod(objectReference: ObjectReference, method: Method, args: Value*): Value = {
-    import scala.collection.JavaConverters._
-    val result = objectReference.invokeMethod(thread, method, args.asJava, 0)
-    updateStackFramesAfterInvocation()
-    result
+    val future = actor !! InvokeMethod(objectReference, method, args.toList)
+
+    future.inputChannel.receive {
+      case value: Value =>
+        value
+    }
   }
 
 }
