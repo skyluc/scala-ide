@@ -39,13 +39,16 @@ class ScalaThread(target: ScalaDebugTarget, val thread: ThreadReference) extends
   // Members declared in org.eclipse.debug.core.model.ISuspendResume
 
   def canResume(): Boolean = suspended // TODO: need real logic
-  def canSuspend(): Boolean = false // TODO: need real logic
+  def canSuspend(): Boolean = !suspended // TODO: need real logic
   def isSuspended(): Boolean = suspended // TODO: need real logic
   def resume(): Unit = {
     thread.resume
     resumedFromScala(DebugEvent.CLIENT_REQUEST)
   }
-  def suspend(): Unit = ???
+  def suspend(): Unit = {
+    thread.suspend
+    suspendedFromScala(DebugEvent.CLIENT_REQUEST)
+  }
 
   // Members declared in org.eclipse.debug.core.model.IThread
 
