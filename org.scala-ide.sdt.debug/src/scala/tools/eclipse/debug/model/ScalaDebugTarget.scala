@@ -104,9 +104,9 @@ class ScalaDebugTarget(val javaTarget: JDIDebugTarget, threadStartRequest: Threa
   def handleEvent(event: Event, target: JDIDebugTarget, suspendVote: Boolean, eventSet: EventSet): Boolean = {
     event match {
       case threadStartEvent: ThreadStartEvent =>
-        actor ! threadStartEvent
+        actor !? threadStartEvent
       case threadDeathEvent: ThreadDeathEvent =>
-        actor ! threadDeathEvent
+        actor !? threadDeathEvent
       case _ =>
         ???
     }
@@ -127,16 +127,19 @@ class ScalaDebugTarget(val javaTarget: JDIDebugTarget, threadStartRequest: Threa
       loop {
         react {
           case threadStartEvent: ThreadStartEvent =>
-            threads += new ScalaThread(ScalaDebugTarget.this, threadStartEvent.thread)
+            if (!threads.exists(_.thread == threadStartEvent.thread))
+              threads = threads :+ new ScalaThread(ScalaDebugTarget.this, threadStartEvent.thread)
+            reply(this)
           case threadDeathEvent: ThreadDeathEvent =>
-            val scalaThread = threads.find(_.thread == threadDeathEvent.thread)
-            scalaThread.foreach(_.terminatedFromScala)
-            threads --= scalaThread
+            val (removed, remainder) = threads.partition(_.thread == threadDeathEvent.thread)
+            threads = remainder
+            removed.foreach(_.terminatedFromScala)
+            reply(this)
           case ThreadSuspendedFromJava(thread, eventDetail) =>
             threads.find(_.thread == thread.getUnderlyingThread).get.suspendedFromJava(eventDetail)
             reply(this)
           case TerminatedFromJava =>
-            threads.clear
+            threads = Nil
             running = false
             fireTerminateEvent
             exit
@@ -151,9 +154,9 @@ class ScalaDebugTarget(val javaTarget: JDIDebugTarget, threadStartRequest: Threa
   
   val actor = new EventActor
 
-  val threads = {
+  var threads = {
     import scala.collection.JavaConverters._
-    javaTarget.getVM.allThreads.asScala.map(new ScalaThread(this, _))
+    javaTarget.getVM.allThreads.asScala.toList.map(new ScalaThread(this, _))
   }
 
   fireCreationEvent
