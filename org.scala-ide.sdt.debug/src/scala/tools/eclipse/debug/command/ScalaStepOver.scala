@@ -41,6 +41,7 @@ object ScalaStepOver {
 
       val classPrepareRequest = eventRequestManager.createClassPrepareRequest
       classPrepareRequest.addClassFilter(location.declaringType.name + "$*")
+      classPrepareRequest.setSuspendPolicy(EventRequest.SUSPEND_EVENT_THREAD)
 
       requests += classPrepareRequest
 
