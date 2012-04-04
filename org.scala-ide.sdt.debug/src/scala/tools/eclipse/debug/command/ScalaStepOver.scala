@@ -67,6 +67,7 @@ object ScalaStepOver {
     import scala.collection.JavaConverters._
 
     val breakpointRequest = thread.virtualMachine.eventRequestManager.createBreakpointRequest(method.location)
+    breakpointRequest.setSuspendPolicy(EventRequest.SUSPEND_EVENT_THREAD)
     breakpointRequest.addThreadFilter(thread)
 
     breakpointRequest

@@ -53,6 +53,8 @@ class ScalaDebugSteppingTest {
     session.stepOver()
 
     session.checkStackFrame(TYPENAME_FC_LS + "$$anonfun$main$1", "apply(Ljava/lang/String;)I", 10)
+    
+    session.checkThreadsState
   }
 
   @Test
