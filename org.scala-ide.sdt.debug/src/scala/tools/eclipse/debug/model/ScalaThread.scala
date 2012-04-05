@@ -108,7 +108,7 @@ class ScalaThread(target: ScalaDebugTarget, val thread: ThreadReference) extends
               throw new Exception("Not suspended")
             } else {
               import scala.collection.JavaConverters._
-              val result = objectReference.invokeMethod(thread, method, args.asJava, 0)
+              val result = objectReference.invokeMethod(thread, method, args.asJava, ObjectReference.INVOKE_SINGLE_THREADED)
               // update the stack frames
               thread.frames.asScala.iterator.zip(stackFrames.iterator).foreach(
                 v => v._2.rebind(v._1))
