@@ -131,6 +131,8 @@ class ScalaThread(target: ScalaDebugTarget, val thread: ThreadReference) extends
   var stackFrames: List[ScalaStackFrame] = Nil
 
   val actor = new EventActor
+  
+  var lastExitValue: ScalaValue = null
 
   // initialize name
   private var name: String = null

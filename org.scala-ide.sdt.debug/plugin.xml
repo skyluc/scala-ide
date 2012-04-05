@@ -36,4 +36,11 @@
             modelIdentifier="org.scala-ide.sdt.debug">
       </logicalStructureProvider>
    </extension>
+   <extension
+         point="org.eclipse.debug.core.watchExpressionDelegates">
+      <watchExpressionDelegate
+            debugModel="org.scala-ide.sdt.debug"
+            delegateClass="scala.tools.eclipse.debug.ScalaWatchExpressionDelegate">
+      </watchExpressionDelegate>
+   </extension>
 </plugin>

@@ -37,7 +37,7 @@ object ScalaValue {
         // TODO : cache one per target
         new ScalaNullValue(target)
       case voidValue: VoidValue =>
-        ??? // TODO: in what cases do we get this value ?
+        null // TODO: in what cases do we get this value ? right now return null, for the method exit watch expression
       case _ =>
         ???
     }

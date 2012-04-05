@@ -11,6 +11,9 @@ import scala.tools.eclipse.debug.model.ScalaThread
 import scala.tools.eclipse.debug.model.ScalaDebugTarget
 import org.eclipse.debug.core.DebugEvent
 import com.sun.jdi.event.StepEvent
+import com.sun.jdi.request.MethodExitRequest
+import com.sun.jdi.event.MethodExitEvent
+import scala.tools.eclipse.debug.model.ScalaValue
 
 object ScalaStepReturn {
 
@@ -18,16 +21,20 @@ object ScalaStepReturn {
 
     val eventRequestManager = scalaStackFrame.stackFrame.virtualMachine.eventRequestManager
 
-    val stepIntoRequest = eventRequestManager.createStepRequest(scalaStackFrame.stackFrame.thread, StepRequest.STEP_LINE, StepRequest.STEP_OUT)
-    stepIntoRequest.setSuspendPolicy(EventRequest.SUSPEND_EVENT_THREAD)
+    val stepReturnRequest = eventRequestManager.createStepRequest(scalaStackFrame.stackFrame.thread, StepRequest.STEP_LINE, StepRequest.STEP_OUT)
+    stepReturnRequest.setSuspendPolicy(EventRequest.SUSPEND_EVENT_THREAD)
+    
+    val methodExitRequest = eventRequestManager.createMethodExitRequest
+    methodExitRequest.addThreadFilter(scalaStackFrame.stackFrame.thread)
+    methodExitRequest.setSuspendPolicy(EventRequest.SUSPEND_EVENT_THREAD)
 
-    new ScalaStepReturn(scalaStackFrame.getScalaDebugTarget, scalaStackFrame.thread, stepIntoRequest)
+    new ScalaStepReturn(scalaStackFrame.getScalaDebugTarget, scalaStackFrame.thread, stepReturnRequest, methodExitRequest)
   }
 
 }
 
 // TODO: when implementing support without filtering, need to workaround problem reported in Eclipse bug #38744
-class ScalaStepReturn(target: ScalaDebugTarget, thread: ScalaThread, stepReturnRequest: StepRequest) extends IJDIEventListener with ScalaStep {
+class ScalaStepReturn(target: ScalaDebugTarget, thread: ScalaThread, stepReturnRequest: StepRequest, methodExitRequest: MethodExitRequest) extends IJDIEventListener with ScalaStep {
 
   // Members declared in org.eclipse.jdt.internal.debug.core.IJDIEventListener
 
@@ -45,6 +52,9 @@ class ScalaStepReturn(target: ScalaDebugTarget, thread: ScalaThread, stepReturnR
         } else {
           true
         }
+      case methodExitEvent: MethodExitEvent =>
+        thread.lastExitValue= ScalaValue(methodExitEvent.returnValue, thread.getScalaDebugTarget)
+        true
       case _ =>
         suspendVote
     }
@@ -56,7 +66,9 @@ class ScalaStepReturn(target: ScalaDebugTarget, thread: ScalaThread, stepReturnR
     val eventDispatcher = target.javaTarget.getEventDispatcher
 
     eventDispatcher.addJDIEventListener(this, stepReturnRequest)
+    eventDispatcher.addJDIEventListener(this, methodExitRequest)
     stepReturnRequest.enable
+    methodExitRequest.enable
     thread.resumedFromScala(DebugEvent.STEP_RETURN)
     thread.thread.resume
   }
@@ -67,8 +79,11 @@ class ScalaStepReturn(target: ScalaDebugTarget, thread: ScalaThread, stepReturnR
     val eventRequestManager = thread.thread.virtualMachine.eventRequestManager
 
     stepReturnRequest.disable
+    methodExitRequest.disable
     eventDispatcher.removeJDIEventListener(this, stepReturnRequest)
+    eventDispatcher.removeJDIEventListener(this, methodExitRequest)
     eventRequestManager.deleteEventRequest(stepReturnRequest)
+    eventRequestManager.deleteEventRequest(methodExitRequest)
   }
 
 }

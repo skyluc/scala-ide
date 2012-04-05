@@ -26,6 +26,8 @@ object ScalaDebugger extends IDebugEventSetListener with ISelectionListener {
   }
 
   val modelId = "org.scala-ide.sdt.debug"
+    
+  val METHOD_EXIT_WATCH_EXPRESSION_KEY = "<methodExitValue>"
 
   // Members declared in org.eclipse.debug.core.IDebugEventSetListener
 
@@ -86,6 +88,14 @@ object ScalaDebugger extends IDebugEventSetListener with ISelectionListener {
     if (!ScalaPlugin.plugin.headlessMode) {
       // TODO: really ugly. Need to keep track of current selection per window.
       WorkbenchPlugin.getDefault.getWorkbench.getWorkbenchWindows.apply(0).getSelectionService.addSelectionListener("org.eclipse.debug.ui.DebugView", this)
+    }
+    
+    // create a watch expression for return value
+    val expressionManager= DebugPlugin.getDefault.getExpressionManager
+    if (!expressionManager.getExpressions.exists(_.getExpressionText == METHOD_EXIT_WATCH_EXPRESSION_KEY)) {
+      val methodExitValueWatchExpression= expressionManager.newWatchExpression(METHOD_EXIT_WATCH_EXPRESSION_KEY)
+      expressionManager.addExpression(methodExitValueWatchExpression)
+      methodExitValueWatchExpression.setEnabled(true)
     }
   }
 

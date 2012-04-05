@@ -28,6 +28,7 @@ import org.eclipse.core.runtime.Status
 import scala.tools.eclipse.debug.ScalaDebugPlugin
 import com.sun.jdi.PrimitiveValue
 import org.eclipse.jdt.internal.ui.javaeditor.EditorUtility
+import org.eclipse.debug.core.model.IWatchExpression
 
 object ScalaDebugModelPresentation {
   def computeDetail(value: IValue): String = {
@@ -142,6 +143,9 @@ class ScalaDebugModelPresentation extends IDebugModelPresentation {
       case variable: ScalaVariable =>
         // TODO: right image depending on ?
         DebugUITools.getImage(IDebugUIConstants.IMG_OBJS_VARIABLE)
+      case watchExpression: IWatchExpression =>
+        // TODO: right image depending on enable state
+        DebugUITools.getImage(IDebugUIConstants.IMG_OBJS_WATCHPOINT)
       case _ =>
         ???
     }
