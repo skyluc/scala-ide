@@ -25,10 +25,9 @@ import java.net.InetAddress;
 import java.net.ServerSocket;
 import java.net.Socket;
 import java.net.SocketException;
+import java.text.MessageFormat;
 import java.util.HashMap;
 import java.util.Map;
-
-import com.ibm.icu.text.MessageFormat;
 
 /**
  * This class can be used to spy all JDWP packets. It should be configured 'in

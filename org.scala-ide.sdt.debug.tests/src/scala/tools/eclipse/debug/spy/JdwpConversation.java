@@ -10,7 +10,7 @@
  *******************************************************************************/
 package scala.tools.eclipse.debug.spy;
 
-import com.ibm.icu.text.MessageFormat;
+import java.text.MessageFormat;
 
 public class JdwpConversation {
 	private int fId;
