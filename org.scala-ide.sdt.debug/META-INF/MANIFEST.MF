@@ -5,7 +5,6 @@ Bundle-SymbolicName: org.scala-ide.sdt.debug;singleton:=true
 Bundle-Version: 2.1.0.qualifier
 Bundle-Vendor: scala-ide.org
 Bundle-ActivationPolicy: lazy
-Bundle-Localization: plugin
 Bundle-Activator: 
  scala.tools.eclipse.debug.ScalaDebugPlugin
 Require-Bundle: 
