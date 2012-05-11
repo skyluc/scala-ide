@@ -22,8 +22,7 @@ public abstract class ScalaJavaBuilder extends JavaBuilder {
   }
   
   @Override
-  @SuppressWarnings("unchecked")
-  public IProject[] build(int kind, Map ignored, IProgressMonitor monitor) throws CoreException {
+  public IProject[] build(int kind, @SuppressWarnings("rawtypes") Map ignored, IProgressMonitor monitor) throws CoreException {
     return super.build(kind, ignored, monitor);
   }
   

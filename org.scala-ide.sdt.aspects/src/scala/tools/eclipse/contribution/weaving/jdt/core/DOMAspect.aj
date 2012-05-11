@@ -5,25 +5,17 @@
 
 package scala.tools.eclipse.contribution.weaving.jdt.core;
 
-import java.util.Locale;
-import java.util.Map;
 
 import org.eclipse.core.runtime.IProgressMonitor;
-import org.eclipse.jdt.core.ICompilationUnit;
 import org.eclipse.jdt.core.IJavaElement;
-import org.eclipse.jdt.core.IType;
 import org.eclipse.jdt.core.JavaModelException;
 import org.eclipse.jdt.core.compiler.CharOperation;
-import org.eclipse.jdt.core.dom.AST;
 import org.eclipse.jdt.core.dom.ASTNode;
 import org.eclipse.jdt.core.dom.ASTParser;
 import org.eclipse.jdt.internal.compiler.CompilationResult;
-import org.eclipse.jdt.internal.compiler.DefaultErrorHandlingPolicies;
 import org.eclipse.jdt.internal.compiler.ast.AbstractMethodDeclaration;
-import org.eclipse.jdt.internal.compiler.ast.AbstractVariableDeclaration;
 import org.eclipse.jdt.internal.compiler.ast.AnnotationMethodDeclaration;
 import org.eclipse.jdt.internal.compiler.ast.Argument;
-import org.eclipse.jdt.internal.compiler.ast.CompilationUnitDeclaration;
 import org.eclipse.jdt.internal.compiler.ast.ConstructorDeclaration;
 import org.eclipse.jdt.internal.compiler.ast.Expression;
 import org.eclipse.jdt.internal.compiler.ast.MethodDeclaration;
@@ -33,26 +25,11 @@ import org.eclipse.jdt.internal.compiler.ast.TypeDeclaration;
 import org.eclipse.jdt.internal.compiler.ast.TypeParameter;
 import org.eclipse.jdt.internal.compiler.ast.TypeReference;
 import org.eclipse.jdt.internal.compiler.classfmt.ClassFileConstants;
-import org.eclipse.jdt.internal.compiler.env.AccessRestriction;
-import org.eclipse.jdt.internal.compiler.env.IBinaryType;
-import org.eclipse.jdt.internal.compiler.env.INameEnvironment;
-import org.eclipse.jdt.internal.compiler.env.ISourceType;
-import org.eclipse.jdt.internal.compiler.impl.CompilerOptions;
-import org.eclipse.jdt.internal.compiler.impl.ITypeRequestor;
-import org.eclipse.jdt.internal.compiler.lookup.LookupEnvironment;
-import org.eclipse.jdt.internal.compiler.lookup.PackageBinding;
 import org.eclipse.jdt.internal.compiler.parser.SourceTypeConverter;
-import org.eclipse.jdt.internal.compiler.problem.DefaultProblemFactory;
-import org.eclipse.jdt.internal.compiler.problem.ProblemReporter;
-import org.eclipse.jdt.internal.core.DefaultWorkingCopyOwner;
-import org.eclipse.jdt.internal.core.JavaProject;
 import org.eclipse.jdt.internal.core.SourceAnnotationMethodInfo;
 import org.eclipse.jdt.internal.core.SourceMethod;
 import org.eclipse.jdt.internal.core.SourceMethodElementInfo;
 import org.eclipse.jdt.internal.core.SourceType;
-import org.eclipse.jdt.internal.core.SourceTypeElementInfo;
-
-import scala.tools.eclipse.contribution.weaving.jdt.IScalaCompilationUnit;
 
 @SuppressWarnings("restriction")
 public privileged aspect DOMAspect {
@@ -158,30 +135,6 @@ public privileged aspect DOMAspect {
     }
   }*/
   
-  private void fixMethods(AbstractMethodDeclaration[] methods) {
-    if (methods == null)
-      return;
-    
-    for(int i = 0, iLimit = methods.length; i < iLimit; ++i) {
-      AbstractMethodDeclaration m = methods[i];
-      m.bodyStart = m.declarationSourceStart;
-      m.bodyEnd = m.declarationSourceEnd;
-      if (m.binding != null) {
-        m.binding.getAnnotationTagBits();
-      }
-    }
-  }
-  
-  private void fixFields(AbstractVariableDeclaration[] fields) {
-    if (fields == null)
-      return;
-    
-    for(int i = 0, iLimit = fields.length; i < iLimit; ++i) {
-      AbstractVariableDeclaration f = fields[i];
-      f.declarationEnd = f.declarationSourceEnd;
-    }
-  }
-
   AbstractMethodDeclaration around(SourceTypeConverter stc, SourceMethod methodHandle, SourceMethodElementInfo methodInfo, CompilationResult compilationResult) throws JavaModelException :
     convert(stc, methodHandle, methodInfo, compilationResult) {
     AbstractMethodDeclaration method;

@@ -22,7 +22,8 @@ public privileged aspect PluginImportAspect {
   }
 
   public static boolean folderContainsSourceExtension(IImportStructureProvider provider, Object element) {
-    List children = provider.getChildren(element);
+    @SuppressWarnings("unchecked")
+	List<Object> children = provider.getChildren(element);
     if (children != null && !children.isEmpty()) {
       for (int i = 0; i < children.size(); i++) {
         Object curr = children.get(i);

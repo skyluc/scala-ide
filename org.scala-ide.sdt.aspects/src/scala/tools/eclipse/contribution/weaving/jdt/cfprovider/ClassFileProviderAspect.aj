@@ -230,7 +230,7 @@ public privileged aspect ClassFileProviderAspect {
       IType tpe = ((SourceTypeElementInfo)suppliedType).getHandle();
       IClassFile cf = tpe.getClassFile();
       if (cf instanceof IScalaClassFile) {
-        hr.resolve(new Openable[]{(Openable)cf}, new HashSet(), null);
+        hr.resolve(new Openable[]{(Openable)cf}, new HashSet<String>(), null);
         return;
       }
     }

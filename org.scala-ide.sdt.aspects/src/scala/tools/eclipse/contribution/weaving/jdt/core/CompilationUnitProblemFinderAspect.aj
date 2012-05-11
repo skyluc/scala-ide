@@ -6,7 +6,6 @@
 package scala.tools.eclipse.contribution.weaving.jdt.core;
 
 import java.util.HashMap;
-import java.util.List;
 
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.jdt.core.IJavaModelMarker;
@@ -27,7 +26,7 @@ public privileged aspect CompilationUnitProblemFinderAspect {
     CompilationUnit unitElement,
     SourceElementParser parser,
     WorkingCopyOwner workingCopyOwner,
-    HashMap problems,
+    HashMap<String, CategorizedProblem[]> problems,
     boolean creatingAST,
     int reconcileFlags,
     IProgressMonitor monitor) : 
@@ -39,7 +38,7 @@ public privileged aspect CompilationUnitProblemFinderAspect {
     CompilationUnit unitElement,
     SourceElementParser parser,
     WorkingCopyOwner workingCopyOwner,
-    HashMap problems,
+    HashMap<String, CategorizedProblem[]>  problems,
     boolean creatingAST,
     int reconcileFlags,
     IProgressMonitor monitor) :

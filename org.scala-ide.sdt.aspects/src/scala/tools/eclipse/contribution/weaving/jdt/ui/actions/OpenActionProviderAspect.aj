@@ -40,7 +40,7 @@ public privileged aspect OpenActionProviderAspect {
             + "\tHint: To fix this look in your plugin.xml file and make sure to declare at most one provider class for the extension point: "
             + OpenActionProviderRegistry.OPEN_ACTION_PROVIDERS_EXTENSION_POINT;
 
-        ScalaJDTWeavingPlugin.getInstance().logErrorMessage(msg);
+        ScalaJDTWeavingPlugin.logErrorMessage(msg);
 
         return proceed(editor);
       }

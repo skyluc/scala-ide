@@ -36,6 +36,8 @@ import scala.tools.eclipse.hyperlink.text.detector.DeclarationHyperlinkDetector
 import org.eclipse.ui.texteditor.ITextEditor
 import scala.tools.eclipse.hyperlink.text.detector.BaseHyperlinkDetector
 import scala.tools.eclipse.util.EditorUtils
+import org.eclipse.jface.text.source.Annotation
+import org.eclipse.jface.text.Position
 
 trait ScalaCompilationUnit extends Openable with env.ICompilationUnit with ScalaElement with IScalaCompilationUnit with IBufferChangedListener with HasLogger {
   val project = ScalaPlugin.plugin.getScalaProject(getJavaProject.getProject)
@@ -234,7 +236,7 @@ trait ScalaCompilationUnit extends Openable with env.ICompilationUnit with Scala
     }
   }
   
-  override def createOverrideIndicators(annotationMap : JMap[_, _]) {
+  override def createOverrideIndicators(annotationMap : JMap[Annotation, Position]) {
     if (project.hasScalaNature)
       doWithSourceFile { (sourceFile, compiler) =>
         try {

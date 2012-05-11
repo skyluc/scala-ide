@@ -6,12 +6,7 @@
 package scala.tools.eclipse.contribution.weaving.jdt.ui;
 
 import org.eclipse.jdt.core.IMethod;
-import org.eclipse.jdt.core.IType;
 import org.eclipse.jdt.core.JavaModelException;
-import org.eclipse.jdt.internal.corext.util.JdtFlags;
-import org.eclipse.jdt.internal.corext.util.MethodOverrideTester;
-import org.eclipse.jdt.internal.corext.util.SuperTypeHierarchyCache;
-import org.eclipse.jdt.ui.JavaElementImageDescriptor;
 import org.eclipse.jdt.ui.OverrideIndicatorLabelDecorator;
 
 @SuppressWarnings("restriction")

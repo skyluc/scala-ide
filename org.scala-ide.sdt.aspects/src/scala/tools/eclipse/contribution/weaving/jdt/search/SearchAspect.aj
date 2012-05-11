@@ -1,9 +1,6 @@
 package scala.tools.eclipse.contribution.weaving.jdt.search;
 
 import org.eclipse.core.runtime.CoreException;
-import org.eclipse.jdt.internal.compiler.classfmt.ClassFileReader;
-import org.eclipse.jdt.internal.core.BinaryType;
-import org.eclipse.jdt.internal.core.ClassFile;
 import org.eclipse.jdt.internal.core.search.matching.MatchLocator;
 import org.eclipse.jdt.internal.core.search.matching.PossibleMatch;
 

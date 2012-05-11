@@ -21,7 +21,7 @@ import org.eclipse.jface.text.IRegion;
 @SuppressWarnings("restriction")
 public privileged aspect FormatterCleanUpRegistryAspect {
 
-	pointcut calculateChange(CleanUpContext cleanUpContext, ICleanUp[] cleanUps, List undoneCleanUps, HashSet slowCleanUps) :
+	pointcut calculateChange(CleanUpContext cleanUpContext, ICleanUp[] cleanUps, List<ICleanUp> undoneCleanUps, HashSet<ICleanUp> slowCleanUps) :
 		args(cleanUpContext, cleanUps, undoneCleanUps, slowCleanUps) && 
 	   execution(CleanUpChange CleanUpRefactoring.calculateChange(CleanUpContext, ICleanUp[] , List , HashSet ));
 		
@@ -47,7 +47,7 @@ public privileged aspect FormatterCleanUpRegistryAspect {
 	}
  
 	// Filter out CleanUps that aren't yet Scala compatible:
-	CleanUpChange around(CleanUpContext cleanUpContext, ICleanUp[] cleanUps, List undoneCleanUps, HashSet slowCleanUps):
+	CleanUpChange around(CleanUpContext cleanUpContext, ICleanUp[] cleanUps, List<ICleanUp> undoneCleanUps, HashSet<ICleanUp> slowCleanUps):
 		calculateChange(cleanUpContext, cleanUps, undoneCleanUps, slowCleanUps) {
 		ICleanUp[] newCleanUps;
 		if ("scala".equals(cleanUpContext.getCompilationUnit().getResource().getFileExtension())) {

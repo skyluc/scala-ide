@@ -23,7 +23,7 @@ public aspect SourceLookupAspect {
       String sourceFile = (String)object;
       if (sourceFile.endsWith(".java")) {
         String scalaSourceFile = sourceFile.substring(0, sourceFile.length()-5)+".scala";
-        List result = new ArrayList();
+        List<Object> result = new ArrayList<Object>();
         Object[] scalaResults = proceed(scalaSourceFile);
         Object[] javaResults = proceed(sourceFile);
         result.addAll(Arrays.asList(scalaResults));

@@ -5,13 +5,11 @@
 
 package scala.tools.eclipse.contribution.weaving.jdt.hierarchy;
 
-import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
 
-import org.eclipse.core.resources.IProject;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.jdt.core.ICompilationUnit;
 import org.eclipse.jdt.core.IJavaElement;
@@ -32,12 +30,11 @@ import org.eclipse.swt.widgets.Event;
 import scala.tools.eclipse.contribution.weaving.jdt.IScalaCompilationUnit;
 import scala.tools.eclipse.contribution.weaving.jdt.IScalaElement;
 import scala.tools.eclipse.contribution.weaving.jdt.IScalaOverrideIndicator;
-import scala.tools.eclipse.contribution.weaving.jdt.util.ReflectionUtils;
 
 @SuppressWarnings("restriction")
 public privileged aspect HierarchyAspect {
   
-  pointcut getAllTypesFromElement(ChangeCollector cc, IJavaElement element, ArrayList allTypes) :
+  pointcut getAllTypesFromElement(ChangeCollector cc, IJavaElement element, ArrayList<IType> allTypes) :
     execution(void ChangeCollector.getAllTypesFromElement(IJavaElement, ArrayList)) &&
     args(element, allTypes) &&
     target(cc);
@@ -64,12 +61,12 @@ public privileged aspect HierarchyAspect {
     args(event) &&
     target(jsara);
   
-  void around(ChangeCollector cc, IJavaElement element, ArrayList allTypes) throws JavaModelException :
+  void around(ChangeCollector cc, IJavaElement element, ArrayList<IType> allTypes) throws JavaModelException :
     getAllTypesFromElement(cc, element, allTypes) {
     getAllTypesFromElement0(cc, element, allTypes);
   }
 
-  public void getAllTypesFromElement0(ChangeCollector cc, IJavaElement element, ArrayList allTypes) throws JavaModelException {
+  public void getAllTypesFromElement0(ChangeCollector cc, IJavaElement element, ArrayList<IType> allTypes) throws JavaModelException {
     switch (element.getElementType()) {
       case IJavaElement.COMPILATION_UNIT:
         IType[] types = ((ICompilationUnit)element).getTypes();
@@ -112,7 +109,7 @@ public privileged aspect HierarchyAspect {
       return;
     }
     
-    HashMap annotationMap = new HashMap();
+    HashMap<Annotation, Position> annotationMap = new HashMap<Annotation, Position>();
     ((IScalaCompilationUnit)oim.fJavaElement).createOverrideIndicators(annotationMap);
     
     if (progressMonitor.isCanceled())
@@ -123,9 +120,9 @@ public privileged aspect HierarchyAspect {
         ((IAnnotationModelExtension)oim.fAnnotationModel).replaceAnnotations(oim.fOverrideAnnotations, annotationMap);
       } else {
         oim.removeAnnotations();
-        Iterator iter= annotationMap.entrySet().iterator();
+        Iterator<Map.Entry<Annotation, Position>> iter= annotationMap.entrySet().iterator();
         while (iter.hasNext()) {
-          Map.Entry mapEntry= (Map.Entry)iter.next();
+          Map.Entry<Annotation, Position> mapEntry= (Map.Entry<Annotation, Position>)iter.next();
           oim.fAnnotationModel.addAnnotation((Annotation)mapEntry.getKey(), (Position)mapEntry.getValue());
         }
       }
