@@ -40,8 +40,8 @@ public privileged aspect ScalaJavaBuilderAspect {
     cflow(build()) {
     // Suppress the cleaning behaviour but do the extra resource copying if requested
     if (copyBack)
-      for (int i = 0, l = builder.sourceLocations.length; i < l; i++) {
-        org.eclipse.jdt.internal.core.builder.ClasspathMultiDirectory sourceLocation = builder.sourceLocations[i];
+    	
+      for (org.eclipse.jdt.internal.core.builder.ClasspathMultiDirectory sourceLocation: builder.sourceLocations) {
         if (sourceLocation.hasIndependentOutputFolder)
           builder.copyExtraResourcesBack(sourceLocation, false);
       }

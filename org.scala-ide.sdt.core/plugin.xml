@@ -251,7 +251,7 @@
             id="scala.texteditor.actionset">
          <action
                allowLabelUpdate="true"
-               definitionId="showInferredSemicolonsAction"
+               definitionId="scala.tools.eclipse.toggleShowInferredSemicolonsAction"
                icon="icons/show_inferred_semicolons.png"
                id="showInferredSemicolonsAction"
                label="Show inferred semicolons"

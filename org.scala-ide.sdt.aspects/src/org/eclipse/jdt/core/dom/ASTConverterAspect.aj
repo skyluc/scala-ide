@@ -21,7 +21,7 @@ public privileged aspect ASTConverterAspect {
 
   boolean around(ASTConverter converter, char[] name) :
     isPrimitiveType(converter, name) {
-     System.err.println("aspects are go! name=" + name);
+     System.err.println(new StringBuilder("aspects are go! name=").append(name));
      if (name == null || name.length == 0) {
        return false;
      }
