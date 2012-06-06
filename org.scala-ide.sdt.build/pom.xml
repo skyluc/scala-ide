@@ -258,6 +258,7 @@
           </execution>
         </executions>
         <configuration>
+          <recompileMode>incremental</recompileMode>
           <jvmArgs>
             <jvmArg>-Xms512m</jvmArg>
             <jvmArg>-Xmx1024m</jvmArg>
