@@ -143,9 +143,15 @@
     </dependency>
     <dependency>
       <groupId>org.scala-lang.plugins</groupId>
-      <artifactId>continuations</artifactId>
+      <artifactId>scala-continuations-plugin_${scala.binary.version}</artifactId>
       <classifier>sources</classifier>
-      <version>${scala.version}</version>
+      <version>${scala-continuations-plugin.version.number}</version>
+    </dependency>
+    <dependency>
+      <groupId>org.scala-lang.plugins</groupId>
+      <artifactId>scala-continuations-library_${scala.binary.version}</artifactId>
+      <classifier>sources</classifier>
+      <version>${scala-continuations-library.version.number}</version>
     </dependency>
   </dependencies>
 
@@ -168,13 +174,13 @@
           <groupId>org.scala-lang.modules</groupId>
           <artifactId>scala-xml_${scala.binary.version}</artifactId>
           <classifier>sources</classifier>
-          <version>${scala.xml.version}</version>
+          <version>${scala-xml.version.number}</version>
         </dependency>
         <dependency>
           <groupId>org.scala-lang.modules</groupId>
           <artifactId>scala-parser-combinators_${scala.binary.version}</artifactId>
           <classifier>sources</classifier>
-          <version>${scala.parser-combinators.version}</version>
+          <version>${scala-parser-combinators.version.number}</version>
         </dependency>
       </dependencies>
     </profile>

@@ -124,7 +124,7 @@
                 </artifactItem>
                 <artifactItem>
                   <groupId>org.scala-lang.plugins</groupId>
-                  <artifactId>continuations</artifactId>
+                  <artifactId>scala-continuations-plugin_${scala.binary.version}</artifactId>
                   <type>jar</type>
                   <destFileName>continuations.jar</destFileName>
                 </artifactItem>
