@@ -126,7 +126,13 @@
                   <groupId>org.scala-lang.plugins</groupId>
                   <artifactId>scala-continuations-plugin_${scala.binary.version}</artifactId>
                   <type>jar</type>
-                  <destFileName>continuations.jar</destFileName>
+                  <destFileName>continuations-plugin.jar</destFileName>
+                </artifactItem>
+                <artifactItem>
+                  <groupId>org.scala-lang.plugins</groupId>
+                  <artifactId>scala-continuations-library_${scala.binary.version}</artifactId>
+                  <type>jar</type>
+                  <destFileName>continuations-library.jar</destFileName>
                 </artifactItem>
                 <artifactItem>
                   <groupId>org.scala-lang.modules</groupId>
