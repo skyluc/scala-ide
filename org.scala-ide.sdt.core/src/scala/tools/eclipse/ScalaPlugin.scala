@@ -172,10 +172,10 @@ class ScalaPlugin extends AbstractUIPlugin with PluginLogConfigurator with IReso
   lazy val scalaCompilerBundle = Platform.getBundle(compilerPluginId)
   lazy val scalaCompilerBundleVersion = scalaCompilerBundle.getVersion()
   lazy val compilerClasses = OSGiUtils.getBundlePath(scalaCompilerBundle)
-  lazy val continuationsClasses = OSGiUtils.pathInBundle(sdtCoreBundle, "/target/lib/continuations.jar")
+  lazy val continuationsClasses = OSGiUtils.pathInBundle(sdtCoreBundle, "/target/lib/continuations-plugin.jar")
   lazy val compilerSources = OSGiUtils.pathInBundle(sdtCoreBundle, "/target/src/scala-compiler-src.jar")
 
-  /** The default location used to load compiler's plugins. The convention is that the continuations.jar
+  /** The default location used to load compiler's plugins. The convention is that the continuations-plugin.jar
    * plugin should be always loaded, so that a user can enable continuations by only passing
    * -P:continuations:enable flag. This matches `scalac` behavior. */
   def defaultPluginsDir: String = {
@@ -183,7 +183,7 @@ class ScalaPlugin extends AbstractUIPlugin with PluginLogConfigurator with IReso
       eclipseLog.warn {
         "Could not locate scalac's default plugins directory. " +
         "If you plan on enabling the continuations plugin, please provide the full path to the directory " +
-        "containing the \"continuations.jar\" plugin in the -XpluginDir compiler setting."
+        "containing the \"continuations-plugin.jar\" plugin in the -XpluginDir compiler setting."
       }
       ""
     }
