@@ -101,6 +101,7 @@
         <scala.binary.version>2.11.0-M7</scala.binary.version>
         <scala-xml.version.number>1.0.0-RC7</scala-xml.version.number>
         <scala-parser-combinators.version.number>1.0.0-RC5</scala-parser-combinators.version.number>
+        <scala-swing.version>1.0.0-RC1</scala-swing.version>
         <scala-continuations-plugin.version.number>1.0.0-RC1</scala-continuations-plugin.version.number>
         <scala-continuations-library.version.number>1.0.0-RC1</scala-continuations-library.version.number>
 
@@ -297,9 +298,9 @@
         <version>${scala.library.version}</version>
       </dependency>
       <dependency>
-        <groupId>org.scala-lang</groupId>
-        <artifactId>scala-swing</artifactId>
-        <version>${scala.library.version}</version>
+        <groupId>org.scala-lang.modules</groupId>
+        <artifactId>scala-swing_${scala.binary.version}</artifactId>
+        <version>${scala-swing.version}</version>
       </dependency>
       <dependency>
         <groupId>org.scala-lang</groupId>

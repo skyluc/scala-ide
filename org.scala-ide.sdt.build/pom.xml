@@ -117,10 +117,10 @@
       <version>${scala.library.version}</version>
     </dependency>
     <dependency>
-      <groupId>org.scala-lang</groupId>
-      <artifactId>scala-swing</artifactId>
+      <groupId>org.scala-lang.modules</groupId>
+      <artifactId>scala-swing_${scala.binary.version}</artifactId>
       <classifier>sources</classifier>
-      <version>${scala.library.version}</version>
+      <version>${scala-swing.version}</version>
     </dependency>
     <dependency>
       <groupId>org.scala-lang</groupId>

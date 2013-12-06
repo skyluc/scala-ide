@@ -129,8 +129,8 @@
                   <destFileName>continuations.jar</destFileName>
                 </artifactItem>
                 <artifactItem>
-                  <groupId>org.scala-lang</groupId>
-                  <artifactId>scala-swing</artifactId>
+                  <groupId>org.scala-lang.modules</groupId>
+                  <artifactId>scala-swing_${scala.binary.version}</artifactId>
                   <type>jar</type>
                   <destFileName>scala-swing.jar</destFileName>
                 </artifactItem>
@@ -145,8 +145,8 @@
                   <outputDirectory>${project.build.directory}/src</outputDirectory>
                 </artifactItem>
                 <artifactItem>
-                  <groupId>org.scala-lang</groupId>
-                  <artifactId>scala-swing</artifactId>
+                  <groupId>org.scala-lang.modules</groupId>
+                  <artifactId>scala-swing_${scala.binary.version}</artifactId>
                   <classifier>sources</classifier>
                   <type>jar</type>
                   <destFileName>scala-swing-src.jar</destFileName>
