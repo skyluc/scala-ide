@@ -173,8 +173,8 @@ class ScalaPlugin extends AbstractUIPlugin with PluginLogConfigurator with IReso
   lazy val scalaCompilerBundleVersion = scalaCompilerBundle.getVersion()
   lazy val compilerClasses = OSGiUtils.getBundlePath(scalaCompilerBundle)
   lazy val continuationsClasses = {
-	  OSGiUtils.pathInBundle(sdtCoreBundle, "/target/lib/continuations-library.jar")
-	  OSGiUtils.pathInBundle(sdtCoreBundle, "/target/lib/continuations-plugin.jar")
+    OSGiUtils.pathInBundle(sdtCoreBundle, "/target/lib/continuations-library.jar")
+    OSGiUtils.pathInBundle(sdtCoreBundle, "/target/lib/continuations-plugin.jar")
   }
   lazy val compilerSources = OSGiUtils.pathInBundle(sdtCoreBundle, "/target/src/scala-compiler-src.jar")
 
