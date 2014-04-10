@@ -103,10 +103,10 @@ class ClasspathTests {
     project.storage.setValue(SettingConverterUtil.convertNameToProperty(ScalaPluginSettings.withVersionClasspathValidator.name), false)
     val newRawClasspath= cleanRawClasspath :+ createPreviousScalaLibraryEntry()
     val majorMinor = getPreviousScalaVersion
-    setRawClasspathAndCheckMarkers(newRawClasspath :+ newLibraryEntry("specs2_%s.2-0.12.3.jar".format(majorMinor)), expectedWarnings = 1, expectedErrors = 0)
+    setRawClasspathAndCheckMarkers(newRawClasspath :+ newLibraryEntry("specs2_%s.2-0.12.3.jar".format(majorMinor)), expectedWarnings = 0, expectedErrors = 1)
   }
 
-  /** Std Library is the previous major version of Scala, warning suggesting Xsource addition.
+  /** Std Library is the previous major version of Scala, error suggesting Xsource addition.
    *
    *  One warning from scala library version validation, one error from validation of binaries on classpath.
    */
@@ -115,7 +115,7 @@ class ClasspathTests {
     val majorMinor = getPreviousScalaVersion
     val newRawClasspath= cleanRawClasspath :+ createPreviousScalaLibraryEntry()
 
-    setRawClasspathAndCheckMarkers(newRawClasspath :+ newLibraryEntry("specs2_%s.2-0.12.3.jar".format(majorMinor)), expectedWarnings = 1, expectedErrors = 1)
+    setRawClasspathAndCheckMarkers(newRawClasspath :+ newLibraryEntry("specs2_%s.2-0.12.3.jar".format(majorMinor)), expectedWarnings = 0, expectedErrors = 2)
   }
 
   @Test
@@ -126,7 +126,7 @@ class ClasspathTests {
       project.storage.setValue(CompilerSettings.ADDITIONAL_PARAMS, "-Xsource:"+majorMinor)
       val newRawClasspath= cleanRawClasspath :+ createPreviousScalaLibraryEntry()
 
-      setRawClasspathAndCheckMarkers(newRawClasspath :+ newLibraryEntry("specs2_%s.2-0.12.3.jar".format(majorMinor)), expectedWarnings = 1, expectedErrors = 1)
+      setRawClasspathAndCheckMarkers(newRawClasspath :+ newLibraryEntry("specs2_%s.2-0.12.3.jar".format(majorMinor)), expectedWarnings = 0, expectedErrors = 2)
     } finally{
           project.storage.setToDefault(CompilerSettings.ADDITIONAL_PARAMS)
     }
