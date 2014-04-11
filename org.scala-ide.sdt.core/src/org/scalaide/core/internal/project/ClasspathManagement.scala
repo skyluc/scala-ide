@@ -321,7 +321,7 @@ trait ClasspathManagement extends HasLogger { self: ScalaProject =>
           // if the library is provided by a project in the workspace, disable the warning (the version file is missing anyway)
           Nil
         } else fragmentRoots(0).version match {
-          case Some(v) if ScalaVersion(v) == plugin.scalaVer =>
+          case Some(v) if (!this.isUsingCompatibilityMode() && ScalaVersion(v) == plugin.scalaVer) =>
             // exactly the same version, should be from the container. Perfect
             Nil
           case Some(v) if plugin.isCompatibleVersion(ScalaVersion(v), this) =>
