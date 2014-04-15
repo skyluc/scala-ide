@@ -67,7 +67,7 @@ class ClasspathTests {
 
   @After
   def resetPreferences() {
-    project.storage.setToDefault(SettingConverterUtil.convertNameToProperty(ScalaPluginSettings.withVersionClasspathValidator.name))
+    ScalaPlugin.prefStore.setToDefault(SettingConverterUtil.convertNameToProperty(ScalaPluginSettings.withVersionClasspathValidator.name))
   }
 
   /**
@@ -90,7 +90,7 @@ class ClasspathTests {
    */
   @Test
   def binaryIncompatibleLibraryWithPreferenceFalse() {
-    project.storage.setValue(SettingConverterUtil.convertNameToProperty(ScalaPluginSettings.withVersionClasspathValidator.name), false)
+    ScalaPlugin.prefStore.setValue(SettingConverterUtil.convertNameToProperty(ScalaPluginSettings.withVersionClasspathValidator.name), false)
     val majorMinor = getIncompatibleScalaVersion
     setRawClasspathAndCheckMarkers(baseRawClasspath :+ newLibraryEntry("specs2_%s.2-0.12.3.jar".format(majorMinor)), expectedWarnings = 0, expectedErrors = 0)
   }
@@ -100,7 +100,7 @@ class ClasspathTests {
    */
   @Test
   def previousBinaryWithPreferenceFalse() {
-    project.storage.setValue(SettingConverterUtil.convertNameToProperty(ScalaPluginSettings.withVersionClasspathValidator.name), false)
+    ScalaPlugin.prefStore.setValue(SettingConverterUtil.convertNameToProperty(ScalaPluginSettings.withVersionClasspathValidator.name), false)
     val newRawClasspath= cleanRawClasspath :+ createPreviousScalaLibraryEntry()
     val majorMinor = getPreviousScalaVersion
     setRawClasspathAndCheckMarkers(newRawClasspath :+ newLibraryEntry("specs2_%s.2-0.12.3.jar".format(majorMinor)), expectedWarnings = 0, expectedErrors = 1)
@@ -123,12 +123,12 @@ class ClasspathTests {
     try {
 
       val majorMinor = getPreviousScalaVersion
-      project.storage.setValue(CompilerSettings.ADDITIONAL_PARAMS, "-Xsource:"+majorMinor)
+      project.projectSpecificStorage.setValue(CompilerSettings.ADDITIONAL_PARAMS, "-Xsource:"+majorMinor)
       val newRawClasspath= cleanRawClasspath :+ createPreviousScalaLibraryEntry()
 
       setRawClasspathAndCheckMarkers(newRawClasspath :+ newLibraryEntry("specs2_%s.2-0.12.3.jar".format(majorMinor)), expectedWarnings = 0, expectedErrors = 2)
     } finally {
-      project.storage.setToDefault(CompilerSettings.ADDITIONAL_PARAMS)
+      project.projectSpecificStorage.setToDefault(CompilerSettings.ADDITIONAL_PARAMS)
     }
   }
   /** Std Library is the previous major version of Scala, with Xsource flag activated
@@ -139,14 +139,14 @@ class ClasspathTests {
   def previousLibraryWithXsource() {
     try {
       val majorMinor = getPreviousScalaVersion
-      project.storage.setValue(SettingConverterUtil.USE_PROJECT_SETTINGS_PREFERENCE, true)
-      project.storage.setValue(CompilerSettings.ADDITIONAL_PARAMS, "-Xsource:"+majorMinor)
+      project.projectSpecificStorage.setValue(SettingConverterUtil.USE_PROJECT_SETTINGS_PREFERENCE, true)
+      project.projectSpecificStorage.setValue(CompilerSettings.ADDITIONAL_PARAMS, "-Xsource:"+majorMinor)
       val newRawClasspath= cleanRawClasspath :+ createPreviousScalaLibraryEntry()
 
       setRawClasspathAndCheckMarkers(newRawClasspath :+ newLibraryEntry("specs2_%s.2-0.12.3.jar".format(majorMinor)), expectedWarnings = 1, expectedErrors = 0)
     } finally {
-          project.storage.setToDefault(SettingConverterUtil.USE_PROJECT_SETTINGS_PREFERENCE)
-          project.storage.setToDefault(CompilerSettings.ADDITIONAL_PARAMS)
+          project.projectSpecificStorage.setToDefault(SettingConverterUtil.USE_PROJECT_SETTINGS_PREFERENCE)
+          project.projectSpecificStorage.setToDefault(CompilerSettings.ADDITIONAL_PARAMS)
     }
   }
 
@@ -154,13 +154,13 @@ class ClasspathTests {
   def newerLibraryButWithXSource() {
     try {
       val majorMinor = getPreviousScalaVersion
-      project.storage.setValue(SettingConverterUtil.USE_PROJECT_SETTINGS_PREFERENCE, true)
-      project.storage.setValue(CompilerSettings.ADDITIONAL_PARAMS, "-Xsource:"+majorMinor)
+      project.projectSpecificStorage.setValue(SettingConverterUtil.USE_PROJECT_SETTINGS_PREFERENCE, true)
+      project.projectSpecificStorage.setValue(CompilerSettings.ADDITIONAL_PARAMS, "-Xsource:"+majorMinor)
 
       setRawClasspathAndCheckMarkers(baseRawClasspath, expectedWarnings = 0, expectedErrors = 1)
     } finally {
-      project.storage.setToDefault(SettingConverterUtil.USE_PROJECT_SETTINGS_PREFERENCE)
-      project.storage.setToDefault(CompilerSettings.ADDITIONAL_PARAMS)
+      project.projectSpecificStorage.setToDefault(SettingConverterUtil.USE_PROJECT_SETTINGS_PREFERENCE)
+      project.projectSpecificStorage.setToDefault(CompilerSettings.ADDITIONAL_PARAMS)
     }
   }
 
@@ -171,15 +171,15 @@ class ClasspathTests {
   @Test
   def previousLibraryWithXsourceAndBadBinary() {
     try {
-      project.storage.setValue(SettingConverterUtil.USE_PROJECT_SETTINGS_PREFERENCE, true)
-      project.storage.setValue(CompilerSettings.ADDITIONAL_PARAMS, "-Xsource:"+ getPreviousScalaVersion)
+      project.projectSpecificStorage.setValue(SettingConverterUtil.USE_PROJECT_SETTINGS_PREFERENCE, true)
+      project.projectSpecificStorage.setValue(CompilerSettings.ADDITIONAL_PARAMS, "-Xsource:"+ getPreviousScalaVersion)
       val majorMinor = getIncompatibleScalaVersion
       val newRawClasspath= cleanRawClasspath :+ createPreviousScalaLibraryEntry()
 
       setRawClasspathAndCheckMarkers(newRawClasspath :+ newLibraryEntry("specs2_%s.2-0.12.3.jar".format(majorMinor)), expectedWarnings = 1, expectedErrors = 1)
     } finally{
-          project.storage.setToDefault(CompilerSettings.ADDITIONAL_PARAMS)
-          project.storage.setToDefault(SettingConverterUtil.USE_PROJECT_SETTINGS_PREFERENCE)
+          project.projectSpecificStorage.setToDefault(CompilerSettings.ADDITIONAL_PARAMS)
+          project.projectSpecificStorage.setToDefault(SettingConverterUtil.USE_PROJECT_SETTINGS_PREFERENCE)
     }
   }
 
@@ -188,7 +188,7 @@ class ClasspathTests {
    */
   @Test
   def lowVersionLibrary() {
-    project.storage.setValue(SettingConverterUtil.convertNameToProperty(ScalaPluginSettings.withVersionClasspathValidator.name), false)
+    ScalaPlugin.prefStore.setValue(SettingConverterUtil.convertNameToProperty(ScalaPluginSettings.withVersionClasspathValidator.name), false)
     setRawClasspathAndCheckMarkers(baseRawClasspath :+ newLibraryEntry("specs2_2.7.8-0.12.3.jar"), expectedWarnings = 0, expectedErrors = 0)
   }
 
@@ -459,47 +459,57 @@ class ClasspathTests {
 
   @Test
   def settingErrorsInProjectAreKeptAfterClasspathCheck() {
-    // illegal option
-    project.storage.setValue(CompilerSettings.ADDITIONAL_PARAMS, "-Xi_dont_know")
-
-    project.underlying.build(IncrementalProjectBuilder.CLEAN_BUILD, new NullProgressMonitor)
-    project.underlying.build(IncrementalProjectBuilder.FULL_BUILD, new NullProgressMonitor)
-
-    project.classpathHasChanged() // trick to make the check happen
-
-    val errors = projectErrors(ScalaPlugin.plugin.settingProblemMarkerId)
-
-    // on 2.8 an invalid setting is reported twice, so the total number of errors is 3 or 4
-    assertTrue("unexpected number of scala problems in project: " + errors, errors.nonEmpty)
-
-    // back to normal
-    project.storage.setValue(CompilerSettings.ADDITIONAL_PARAMS, "")
-
-    project.underlying.build(IncrementalProjectBuilder.CLEAN_BUILD, new NullProgressMonitor)
-    project.underlying.build(IncrementalProjectBuilder.FULL_BUILD, new NullProgressMonitor)
-
-    project.classpathHasChanged() // trick to make the check happen
-
-    val errors1 = projectErrors(ScalaPlugin.plugin.problemMarkerId, ScalaPlugin.plugin.settingProblemMarkerId)
-
-    assertEquals("unexpected number of scala problems in project: " + errors1, 2, errors1.length)
+    try {
+      project.projectSpecificStorage.setValue(SettingConverterUtil.USE_PROJECT_SETTINGS_PREFERENCE, true)
+      // illegal option
+      project.projectSpecificStorage.setValue(CompilerSettings.ADDITIONAL_PARAMS, "-Xi_dont_know")
+  
+      project.underlying.build(IncrementalProjectBuilder.CLEAN_BUILD, new NullProgressMonitor)
+      project.underlying.build(IncrementalProjectBuilder.FULL_BUILD, new NullProgressMonitor)
+  
+      project.classpathHasChanged() // trick to make the check happen
+  
+      val errors = projectErrors(ScalaPlugin.plugin.settingProblemMarkerId)
+  
+      // on 2.8 an invalid setting is reported twice, so the total number of errors is 3 or 4
+      assertTrue("unexpected number of scala problems in project: " + errors, errors.nonEmpty)
+  
+      // back to normal
+            project.projectSpecificStorage.setToDefault(CompilerSettings.ADDITIONAL_PARAMS)
+  
+      project.underlying.build(IncrementalProjectBuilder.CLEAN_BUILD, new NullProgressMonitor)
+      project.underlying.build(IncrementalProjectBuilder.FULL_BUILD, new NullProgressMonitor)
+  
+      project.classpathHasChanged() // trick to make the check happen
+  
+      val errors1 = projectErrors(ScalaPlugin.plugin.problemMarkerId, ScalaPlugin.plugin.settingProblemMarkerId)
+  
+      assertEquals("unexpected number of scala problems in project: " + errors1, 2, errors1.length)
+    } finally {
+        project.projectSpecificStorage.setToDefault(CompilerSettings.ADDITIONAL_PARAMS)
+        project.projectSpecificStorage.setToDefault(SettingConverterUtil.USE_PROJECT_SETTINGS_PREFERENCE)
+    }
   }
 
   @Test
   def buildErrorsInProjectAreKeptAfterClasspathCheck() {
-    // illegal option
-    project.storage.setValue(CompilerSettings.ADDITIONAL_PARAMS, "-P:unknown:error")
+    try {
+      project.projectSpecificStorage.setValue(SettingConverterUtil.USE_PROJECT_SETTINGS_PREFERENCE, true)
+      // illegal option
+      project.projectSpecificStorage.setValue(CompilerSettings.ADDITIONAL_PARAMS, "-P:unknown:error")
 
-    project.underlying.build(IncrementalProjectBuilder.CLEAN_BUILD, new NullProgressMonitor)
-    project.underlying.build(IncrementalProjectBuilder.FULL_BUILD, new NullProgressMonitor)
-
-    project.classpathHasChanged() // trick to make the check happen
-
-    val errors = projectErrors(ScalaPlugin.plugin.problemMarkerId, ScalaPlugin.plugin.settingProblemMarkerId)
-
-    assertEquals("unexpected number of scala problems in project: " + errors, 1, errors.length)
-
-    project.storage.setValue(CompilerSettings.ADDITIONAL_PARAMS, "")
+      project.underlying.build(IncrementalProjectBuilder.CLEAN_BUILD, new NullProgressMonitor)
+      project.underlying.build(IncrementalProjectBuilder.FULL_BUILD, new NullProgressMonitor)
+  
+      project.classpathHasChanged() // trick to make the check happen
+  
+      val errors = projectErrors(ScalaPlugin.plugin.problemMarkerId, ScalaPlugin.plugin.settingProblemMarkerId)
+  
+      assertEquals("unexpected number of scala problems in project: " + errors, 1, errors.length)
+    } finally {
+        project.projectSpecificStorage.setToDefault(CompilerSettings.ADDITIONAL_PARAMS)
+        project.projectSpecificStorage.setToDefault(SettingConverterUtil.USE_PROJECT_SETTINGS_PREFERENCE)
+    }
   }
 
 
