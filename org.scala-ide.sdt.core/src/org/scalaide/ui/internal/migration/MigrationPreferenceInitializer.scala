@@ -14,10 +14,13 @@ import org.scalaide.core.ScalaPlugin
 class MigrationPreferenceInitializer extends AbstractPreferenceInitializer {
 
   override def initializeDefaultPreferences(): Unit = {
-    if (ScalaPlugin.plugin.headlessMode) {
+    if (!ScalaPlugin.plugin.headlessMode) {
       // do not run in an UI less environment
-      return
+      doInitializeDefaultPreferences()
     }
+  }
+
+  private def doInitializeDefaultPreferences(): Unit = {
 
     val service = PlatformUI.getWorkbench().getAdapter(classOf[IBindingService]).asInstanceOf[IBindingService]
 
@@ -44,32 +47,26 @@ class MigrationPreferenceInitializer extends AbstractPreferenceInitializer {
       }
 
       val newBindings = bindingsOf(newCommandId)
-      if (newBindings.isEmpty)
-        return
-
-      val doUserBindingsAlreadyExist = newBindings.filter(_.getType() == Binding.USER).nonEmpty
-      if (doUserBindingsAlreadyExist)
-        return
-
+      val userBindingsDoesNotExist = newBindings.filter(_.getType() == Binding.USER).isEmpty
       val oldBindings = bindingsOf(oldCommandId).filter(_.getType() == Binding.USER)
-      if (oldBindings.isEmpty)
-        return
 
-      val allBindings = service.getBindings().filterNot(oldBindings contains _)
+      if (newBindings.nonEmpty && userBindingsDoesNotExist && oldBindings.nonEmpty) {
+        val allBindings = service.getBindings().filterNot(oldBindings contains _)
 
-      val migratedBindings =
-        for (b <- oldBindings) yield new KeyBinding(
-          b.asInstanceOf[KeyBinding].getKeySequence(),
-          newBindings.head.getParameterizedCommand(),
-          b.getSchemeId(),
-          b.getContextId(),
-          b.getLocale(),
-          b.getPlatform(),
-          null,
-          b.getType())
+        val migratedBindings =
+          for (b <- oldBindings) yield new KeyBinding(
+            b.asInstanceOf[KeyBinding].getKeySequence(),
+            newBindings.head.getParameterizedCommand(),
+            b.getSchemeId(),
+            b.getContextId(),
+            b.getLocale(),
+            b.getPlatform(),
+            null,
+            b.getType())
 
-      oldBindings foreach (_.getParameterizedCommand().getCommand().undefine())
-      service.savePreferences(service.getActiveScheme(), allBindings ++ migratedBindings)
+        oldBindings foreach (_.getParameterizedCommand().getCommand().undefine())
+        service.savePreferences(service.getActiveScheme(), allBindings ++ migratedBindings)
+      }
     }
 
     // These values are added for the 4.0 release
