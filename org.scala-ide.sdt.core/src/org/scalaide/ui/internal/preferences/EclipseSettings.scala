@@ -29,7 +29,7 @@ trait EclipseSettings {
   object EclipseSetting {
     /** Function to map a Scala compiler setting to an Eclipse plugin setting */
     private def apply(setting: Settings#Setting): EclipseSetting = setting match {
-      case setting: ScalaPluginSettings.BooleanSettingWithDefault => new CheckBoxSetting(setting, ((b:BooleanSettingWithDefault) => b.default))
+      case setting: ScalaPluginSettings.BooleanSettingWithDefault => new CheckBoxSetting(setting)
       case setting: Settings#BooleanSetting => new CheckBoxSetting(setting)
       case setting: Settings#IntSetting     => new IntegerSetting(setting)
       case setting: Settings#StringSetting =>
@@ -99,9 +99,13 @@ trait EclipseSettings {
 
   /** Boolean setting controlled by a checkbox.
    */
-  private class CheckBoxSetting[T <% Settings#BooleanSetting](setting: T, default: T => Boolean = (b:T) => false)
+  private class CheckBoxSetting(setting: Settings#BooleanSetting, default: => Boolean = false)
     extends EclipseSetting(setting) {
     var control: Button = _
+
+    def this(setting: BooleanSettingWithDefault) = {
+      this(setting, setting.default)
+    }
 
     def createControl(page: Composite) {
       control = new Button(page, SWT.CHECK)
@@ -112,7 +116,7 @@ trait EclipseSettings {
 
     def isChanged = !setting.value.equals(control.getSelection)
 
-    def reset() { control.setSelection(default(setting)) }
+    def reset() { control.setSelection(default) }
 
     def apply() { setting.value = control.getSelection }
   }
