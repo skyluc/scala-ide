@@ -43,6 +43,7 @@ import org.scalaide.logging.HasLogger
 import org.scalaide.core.internal.builder.ProjectsCleanJob
 import org.eclipse.core.resources.ProjectScope
 import org.scalaide.core.internal.project.ScalaProject
+import org.eclipse.jface.preference.ComboFieldEditor
 
 trait ScalaPluginPreferencePage extends HasLogger {
   self: PreferencePage with EclipseSettings =>
@@ -134,12 +135,14 @@ class CompilerSettings extends PropertyPage with IWorkbenchPreferencePage with E
 
   var useProjectSettingsWidget: Option[UseProjectSettingsWidget] = None
   var additionalParamsWidget: AdditionalParametersWidget = _
+  var dslWidget: DesiredSourceLevelWidget = _
 
   def save(): Unit = {
     if (useProjectSettingsWidget.isDefined) {
       useProjectSettingsWidget.get.save
     }
     additionalParamsWidget.save()
+    dslWidget.store()
 
     //This has to come later, as we need to make sure the useProjectSettingsWidget's values make it into
     //the final save.
@@ -183,6 +186,9 @@ class CompilerSettings extends PropertyPage with IWorkbenchPreferencePage with E
         outer.setLayout(new GridLayout(1, false))
         useProjectSettingsWidget = Some(new UseProjectSettingsWidget())
         useProjectSettingsWidget.get.addTo(outer)
+        val other = new Composite(outer, SWT.SHADOW_ETCHED_IN)
+        other.setLayout(new GridLayout(1, false))
+        dslWidget = new DesiredSourceLevelWidget(other)
         val tmp = new Group(outer, SWT.SHADOW_ETCHED_IN)
         tmp.setText("Project Compiler Settings")
         val layout = new GridLayout(1, false)
@@ -191,6 +197,7 @@ class CompilerSettings extends PropertyPage with IWorkbenchPreferencePage with E
         data.grabExcessHorizontalSpace = true
         data.horizontalAlignment = GridData.FILL
         tmp.setLayoutData(data)
+
         tmp
       }
     }
@@ -338,6 +345,16 @@ class CompilerSettings extends PropertyPage with IWorkbenchPreferencePage with E
     def save() {
       preferenceStore0.setValue(USE_PROJECT_SETTINGS_PREFERENCE, control.getSelection)
     }
+  }
+
+  class DesiredSourceLevelWidget(parent:Composite) extends
+    ComboFieldEditor(
+        SettingConverterUtil.SCALA_DESIRED_SOURCELEVEL,
+        "Scala Source Level",
+        Array(Array("2.11", "2.11"),Array("2.10", "2.10")),
+        parent) {
+    setPreferenceStore(preferenceStore0)
+    load()
   }
 
   // LUC_B: it would be nice to have this widget behave like the other 'EclipseSettings', to avoid unnecessary custom code

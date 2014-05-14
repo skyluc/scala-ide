@@ -13,6 +13,7 @@ import org.scalaide.util.internal.Utils.WithAsInstanceOfOpt
 import org.scalaide.util.internal.Utils
 import org.scalaide.util.internal.CompilerUtils
 import scala.concurrent.Promise
+import scala.tools.nsc.settings.ScalaVersion
 
 object ClasspathErrorPromptStatusHandler {
 
@@ -27,10 +28,9 @@ object ClasspathErrorPromptStatusHandler {
 class ClasspathErrorPromptStatusHandler extends RichStatusHandler {
 
   def doHandleStatus(status: IStatus, source: Object) = {
-    val (scalaProject, continuation) = source match {
-      case (p: ScalaProject, c: Promise[() => Unit]) => (Some(p), Some(c))
-      case (_, c: Promise[() => Unit]) => (None, Some(c))
-      case _ => (None, None)
+    val scalaProject  = source match {
+      case (p: ScalaProject) => Some(p)
+      case _ => None
     }
     val shell = ScalaPlugin.getShell
 
@@ -51,14 +51,6 @@ class ClasspathErrorPromptStatusHandler extends RichStatusHandler {
     if (scalaProject.isDefined) {
       val project = scalaProject.get
 
-      def toggleProjectSpecificSettingsAndSetXsource() = {
-        project.projectSpecificStorage.setValue(SettingConverterUtil.USE_PROJECT_SETTINGS_PREFERENCE, true)
-        project.projectSpecificStorage.save()
-        val extraArgs = ScalaPlugin.defaultScalaSettings().splitParams(project.storage.getString(CompilerSettings.ADDITIONAL_PARAMS))
-        val curatedArgs = extraArgs.filter{ s => !s.startsWith("-Xsource") && !s.startsWith("-Ymacro-expand")}
-        project.storage.setValue(CompilerSettings.ADDITIONAL_PARAMS, curatedArgs.mkString(" ") + " -Xsource:" + previousScalaVer + " -Ymacro-expand:none")
-      }
-
       val dialog = new MD(
         shell,
         title,
@@ -69,9 +61,7 @@ class ClasspathErrorPromptStatusHandler extends RichStatusHandler {
         1)
       dialog.open()
       val buttonId = dialog.getReturnCode()
-      if (buttonId == IDialogConstants.OK_ID) continuation.get trySuccess {() => Utils.tryExecute(toggleProjectSpecificSettingsAndSetXsource())}
-      else continuation.get trySuccess {() => }
-    } else continuation map { _ failure (new IllegalArgumentException)}
+      if (buttonId == IDialogConstants.OK_ID) Utils.tryExecute(project.setDesiredSourceLevel(ScalaVersion(previousScalaVer), "Classpath check dialog tasked with restoring compatibility"))
+    }
   }
-
 }
