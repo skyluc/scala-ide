@@ -44,6 +44,8 @@ import org.scalaide.core.internal.builder.ProjectsCleanJob
 import org.eclipse.core.resources.ProjectScope
 import org.scalaide.core.internal.project.ScalaProject
 import org.eclipse.jface.preference.ComboFieldEditor
+import org.eclipse.jface.util.IPropertyChangeListener
+import org.eclipse.jface.util.PropertyChangeEvent
 
 trait ScalaPluginPreferencePage extends HasLogger {
   self: PreferencePage with EclipseSettings =>
@@ -293,7 +295,7 @@ class CompilerSettings extends PropertyPage with IWorkbenchPreferencePage with E
     }.toString)
 
     //check all our other settings
-    additionalParamsWidget.isChanged || super.isChanged
+    /*dslWidget.isChanged ||*/ additionalParamsWidget.isChanged || super.isChanged
   }
 
   override def performDefaults() {
@@ -333,6 +335,7 @@ class CompilerSettings extends PropertyPage with IWorkbenchPreferencePage with E
     def handleToggle() {
       val selected = control.getSelection
       eclipseBoxes.foreach(_.eSettings.foreach(_.setEnabled(selected)))
+      dslWidget.setEnabled(selected)
       additionalParamsWidget.setEnabled(selected)
       updateApplyButton
     }
@@ -355,6 +358,23 @@ class CompilerSettings extends PropertyPage with IWorkbenchPreferencePage with E
         parent) {
     setPreferenceStore(preferenceStore0)
     load()
+
+    private var changed = false
+
+    setPropertyChangeListener(new IPropertyChangeListener {
+      override def propertyChange(event: PropertyChangeEvent) {
+        logger.info(s"old: ${event.getOldValue()} new: ${event.getNewValue()}")
+        changed = event.getOldValue() != event.getNewValue()
+        updateApply()
+      }
+    })
+
+    def setEnabled(enabled: Boolean) {
+      setEnabled(enabled, parent)
+    }
+
+    @volatile
+    def isChanged: Boolean = changed
   }
 
   // LUC_B: it would be nice to have this widget behave like the other 'EclipseSettings', to avoid unnecessary custom code
