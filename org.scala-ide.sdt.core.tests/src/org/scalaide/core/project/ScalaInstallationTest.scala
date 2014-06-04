@@ -52,6 +52,8 @@ class ScalaInstallationTest {
 
         assertEquals("Wrong all jars", expectedAllJars, scalaInstallation.allJars.sortBy(_.toOSString()))
 
+      case SpecificScalaVersion(2, 12, _, _) =>
+        assertEquals("Unexpected Scala bundle", 0, bundledInstallations.length)
       case v =>
         fail(s"Unsupported Scala version: $v")
     }
@@ -68,6 +70,9 @@ class ScalaInstallationTest {
       case SpecificScalaVersion(2, 11, _, _) =>
         assertEquals("Wrong number of Scala bundles", 1, multiBundleInstallations.length)
         checkMultiBundleInstallation(2, 11, multiBundleInstallations.head)
+      case SpecificScalaVersion(2, 12, _, _) =>
+        assertEquals("Wrong number of Scala bundles", 1, multiBundleInstallations.length)
+        checkMultiBundleInstallation(2, 12, multiBundleInstallations.head)
       case v =>
         fail(s"Unsupported Scala version: $v")
     }
