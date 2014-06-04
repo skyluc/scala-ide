@@ -35,10 +35,10 @@
 
       <repositories>
         <repository>
-          <id>scala210</id>
+          <id>scala211</id>
           <name>Scala 211 library and jars</name>
           <layout>p2</layout>
-          <url>file:../org.scala-ide.scala211.build/org.scala-ide.scala21.update-site/target/site</url>
+          <url>file:../org.scala-ide.scala211.build/org.scala-ide.scala211.update-site/target/site</url>
         </repository>
       </repositories>
     </profile>
