@@ -5,12 +5,17 @@ import org.eclipse.core.commands.ExecutionEvent
 import org.eclipse.swt.widgets.Display
 
 class WizardHandler extends AbstractHandler {
-
-  private val DefaultTypeCreator = "org.scalaide.ui.wizards.classCreator"
+  
+  import WizardHandler._
 
   override def execute(e: ExecutionEvent): AnyRef = {
     val d = new NewFileWizard(Display.getCurrent().getActiveShell(), DefaultTypeCreator)
     d.open()
     null
   }
+}
+
+object WizardHandler {
+    val DefaultTypeCreator = "org.scalaide.ui.wizards.classCreator"
+
 }

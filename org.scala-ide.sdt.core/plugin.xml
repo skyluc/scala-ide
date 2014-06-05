@@ -350,6 +350,12 @@
             <description>Create a Scala application</description>
             <selection class="java.lang.Object"/>
       </wizard>
+      <wizard
+            category="org.scala-ide.sdt.core.wizards"
+            class="org.scalaide.ui.internal.wizards.NewFileWizard2"
+            id="org.scala-ide.sdt.core.wizard1"
+            name="New File">
+      </wizard>
    </extension>
    <extension
          point="org.eclipse.ui.ide.projectNatureImages">
