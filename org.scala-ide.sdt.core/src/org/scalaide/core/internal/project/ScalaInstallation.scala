@@ -17,7 +17,7 @@ import org.scalaide.util.internal.eclipse.OSGiUtils
 import xsbti.compile.ScalaInstance
 import java.net.URLClassLoader
 import scala.tools.nsc.settings.SpecificScalaVersion
-import scala.collection.immutable.Set
+import scala.collection.mutable.Set
 import org.scalaide.util.internal.eclipse.EclipseUtils
 import org.eclipse.jdt.core.IClasspathEntry
 import org.eclipse.jdt.core.JavaCore
@@ -28,6 +28,10 @@ import java.io.IOException
 import org.eclipse.core.runtime.CoreException
 import java.io.File
 import org.eclipse.core.runtime.Status
+import org.scalaide.logging.HasLogger
+import scala.util.Try
+import scala.util.Failure
+import scala.util.Success
 
 sealed trait ScalaInstallationLabel extends Serializable
 case class BundledScalaInstallationLabel() extends ScalaInstallationLabel
@@ -62,6 +66,10 @@ trait ScalaInstallation {
 
   override def toString() =
     s"Scala $version: ${allJars.mkString(", ")})"
+
+  def isValid(): Boolean = {
+    allJars forall (_.isValid())
+  }
 }
 
 /**
@@ -69,9 +77,19 @@ trait ScalaInstallation {
  */
 trait LabeledScalaInstallation extends ScalaInstallation {
       def label: ScalaInstallationLabel
+      // to recover bundle-less Bundle values from de-serialized Scala Installations
+      // this should be relaxed for bundles : our bundles are safe, having one with just the same version should be enough
+      def similar(that: LabeledScalaInstallation): Boolean =
+        this.label == that.label && this.compiler == that.compiler && this.library == that.library && this.extraJars.toSet == that.extraJars.toSet
+
+      def getName():Option[String] = PartialFunction.condOpt(label) {case CustomScalaInstallationLabel(tag) => tag}
 }
 
 case class ScalaModule(classJar: IPath, sourceJar: Option[IPath]) {
+
+  def isValid(): Boolean = {
+    sourceJar.fold(List(classJar))(List(_, classJar)) forall {path => path.toFile().isFile()}
+  }
 
   def libraryEntries(): IClasspathEntry = {
     JavaCore.newLibraryEntry(classJar, sourceJar.orNull, null)
@@ -241,7 +259,28 @@ object MultiBundleScalaInstallation {
 
 object ScalaInstallation {
 
-  var customInstallations: Set[LabeledDirectoryScalaInstallation] = Set()
+  val installationsTracker = new ScalaInstallationSaver()
+  def savedScalaInstallations() = Try(installationsTracker.getSavedInstallations())
+  lazy val initialScalaInstallations = savedScalaInstallations() match {
+    case Success(sis) => sis filter (_.isValid()) filter {deserial => !(bundledInstallations ++ multiBundleInstallations exists (_.similar(deserial)))}
+    // we need to silently fail, as this happens early in initialization
+    case Failure(throwable) => Nil
+  }
+
+  // This lets you see installs retrieved from serialized bundles as newly-defined custom installations
+  def customize(install: LabeledScalaInstallation) = install.label match {
+    case CustomScalaInstallationLabel(tag) => install
+    case BundledScalaInstallationLabel() | MultiBundleScalaInstallationLabel() => new LabeledScalaInstallation() {
+      override def label = new CustomScalaInstallationLabel(s"legacy bundle ${install.hashCode()}")
+      override def compiler = install.compiler
+      override def library = install.library
+      override def extraJars = install.extraJars
+      override def scalaInstance = install.scalaInstance
+      override def version = install.version
+    }
+  }
+
+  lazy val customInstallations: Set[LabeledScalaInstallation] = Set() ++ initialScalaInstallations.map(customize(_))
 
   /** Return the Scala installation currently running in Eclipse. */
   lazy val platformInstallation: ScalaInstallation =
@@ -256,9 +295,6 @@ object ScalaInstallation {
   def availableInstallations: List[LabeledScalaInstallation] = {
     multiBundleInstallations ++ bundledInstallations ++ customInstallations
   }
-
-  val installationsTracker = new ScalaInstallationSaver()
-  def savedScalaInstallations = installationsTracker.getSavedInstallations()
 
   val LibraryPropertiesPath = "library.properties"
 
