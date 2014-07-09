@@ -165,7 +165,7 @@ trait CompilerSupport extends EclipseDocumentSupport {
 
   @AfterClass
   final def deleteProject(): Unit = {
-    EclipseUtils.workspaceRunnableIn(ScalaPlugin.plugin.workspaceRoot.getWorkspace()) { _ =>
+    EclipseUtils.workspaceRunnableIn(EclipseUtils.workspaceRoot.getWorkspace()) { _ =>
       project.underlying.delete(/* force */ true, new NullProgressMonitor)
     }
   }

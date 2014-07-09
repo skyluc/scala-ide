@@ -5,7 +5,7 @@ import scala.tools.nsc.settings.ScalaVersion
 import org.eclipse.core.runtime.IProgressMonitor
 import org.scalaide.core.internal.project.ScalaInstallation
 import sbt.compiler.IC
-import org.scalaide.core.ScalaPlugin
+import org.scalaide.core.internal.ScalaPlugin
 import org.eclipse.core.runtime.Platform
 import org.scalaide.util.internal.eclipse.OSGiUtils
 import java.io.File
@@ -15,6 +15,7 @@ import scala.collection.mutable.ListBuffer
 import org.eclipse.core.runtime.SubMonitor
 import org.scalaide.util.internal.eclipse.EclipseUtils._
 import org.scalaide.util.internal.eclipse.FileUtils
+import org.scalaide.core.ScalaConstants
 
 /** This class manages a store of compiler-interface jars (as consumed by Sbt). Each specific
  *  version of Scala needs a compiler-interface jar compiled against that version.
@@ -36,7 +37,7 @@ class CompilerInterfaceStore(base: IPath, plugin: ScalaPlugin) extends HasLogger
   private var hits, misses = 0
 
   private lazy val compilerInterfaceSrc =
-    OSGiUtils.getBundlePath(plugin.sbtCompilerInterfaceBundle).flatMap(computeSourcePath(plugin.sbtCompilerInterfaceId, _))
+    OSGiUtils.getBundlePath(plugin.sbtCompilerInterfaceBundle).flatMap(computeSourcePath(ScalaConstants.SbtCompilerInterfacePluginId, _))
 
   private lazy val sbtFullJar = OSGiUtils.getBundlePath(plugin.sbtCompilerBundle)
 

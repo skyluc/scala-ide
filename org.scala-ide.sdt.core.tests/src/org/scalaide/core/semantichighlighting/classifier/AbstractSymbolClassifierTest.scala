@@ -6,7 +6,6 @@ import org.junit.Before
 import testsetup.TestProjectSetup
 import org.scalaide.core.internal.project.ScalaProject
 import org.scalaide.util.internal.eclipse.EclipseUtils
-import org.scalaide.core.ScalaPlugin
 import org.junit.After
 import org.eclipse.core.runtime.NullProgressMonitor
 import org.eclipse.jface.text.IRegion
@@ -27,7 +26,7 @@ class AbstractSymbolClassifierTest {
 
   @After
   def deleteProject() {
-    EclipseUtils.workspaceRunnableIn(ScalaPlugin.plugin.workspaceRoot.getWorkspace) { _ =>
+    EclipseUtils.workspaceRunnableIn(EclipseUtils.workspaceRoot.getWorkspace) { _ =>
       project.underlying.delete(true, null)
     }
   }

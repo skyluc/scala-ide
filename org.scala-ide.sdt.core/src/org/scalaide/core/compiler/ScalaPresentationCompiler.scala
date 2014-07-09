@@ -445,6 +445,8 @@ class ScalaPresentationCompiler(project: ScalaProject, settings: Settings) exten
 object ScalaPresentationCompiler {
   case class InvalidThread(msg: String) extends RuntimeException(msg)
 
+  def defaultScalaSettings(errorFn: String => Unit = Console.println): Settings = new Settings(errorFn)
+
   class PresentationReporter extends InteractiveReporter {
     var compiler: ScalaPresentationCompiler = null
 

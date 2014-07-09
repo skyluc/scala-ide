@@ -43,6 +43,7 @@ import scalariform.lexer.ScalaLexer
 import org.scalaide.core.internal.repl.EclipseRepl
 import org.scalaide.util.internal.ui.DisplayThread
 import org.scalaide.core.internal.project.ScalaInstallation
+import org.scalaide.core.compiler.ScalaPresentationCompiler
 
 class ReplConsoleView extends ViewPart with InterpreterConsoleView {
 
@@ -166,7 +167,7 @@ class ReplConsoleView extends ViewPart with InterpreterConsoleView {
   }
 
   private def setStarted() {
-    val settings = ScalaPlugin.defaultScalaSettings()
+    val settings = ScalaPresentationCompiler.defaultScalaSettings()
     scalaProject.initializeCompilerSettings(settings, _ => true)
     // TODO ? move into ScalaPlugin.getScalaProject or ScalaProject.classpath
     var cp = settings.classpath.value
