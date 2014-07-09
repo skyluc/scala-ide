@@ -13,7 +13,7 @@ import org.eclipse.ui.texteditor.ITextEditor
 import scalariform.formatter.ScalaFormatter
 import scalariform.parser.ScalaParserException
 import scalariform.utils.TextEdit
-import org.scalaide.core.ScalaPlugin
+import org.scalaide.core.api.ScalaPlugin
 import org.scalaide.util.internal.eclipse.EclipseUtils._
 import org.eclipse.core.resources.IResource
 

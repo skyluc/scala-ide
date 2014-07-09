@@ -14,13 +14,13 @@ import org.eclipse.swt.widgets.Control
 import org.eclipse.swt.widgets.Group
 import org.eclipse.ui.IWorkbench
 import org.eclipse.ui.IWorkbenchPreferencePage
-import org.scalaide.core.ScalaPlugin
+import org.scalaide.core.api.ScalaPlugin
 
 import EditorPreferencePage._
 
 class EditorPreferencePage extends PreferencePage with IWorkbenchPreferencePage {
 
-  private val store = ScalaPlugin.prefStore
+  private val store = ScalaPlugin().getPreferenceStore()
 
   private val preferencesToSave = ListBuffer[() => Unit]()
 
@@ -129,7 +129,7 @@ object EditorPreferencePage {
 class EditorPreferenceInitializer extends AbstractPreferenceInitializer {
 
   override def initializeDefaultPreferences() {
-    val store = ScalaPlugin.plugin.getPreferenceStore
+    val store = ScalaPlugin().getPreferenceStore
     store.setDefault(P_ENABLE_SMART_BRACKETS, false)
     store.setDefault(P_ENABLE_SMART_BRACES, false)
     store.setDefault(P_ENABLE_SMART_PARENS, false)
