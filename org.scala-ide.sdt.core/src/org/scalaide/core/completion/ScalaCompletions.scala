@@ -15,6 +15,8 @@ import scala.collection.mutable.MultiMap
 import org.scalaide.util.internal.Utils
 import org.scalaide.core.IScalaPlugin
 import CompletionContext.ContextType
+import org.scalaide.core.compiler.IScalaPresentationCompiler
+import org.scalaide.core.compiler.IScalaPresentationCompiler.Implicits._
 
 /** Base class for Scala completions. No UI dependency, can be safely used in a
  *  headless testing environment.
@@ -25,7 +27,7 @@ class ScalaCompletions extends HasLogger {
   import org.eclipse.jface.text.IRegion
 
   def findCompletions(region: IRegion)(position: Int, scu: InteractiveCompilationUnit)
-                             (sourceFile: SourceFile, compiler: ScalaPresentationCompiler): List[CompletionProposal] = {
+                             (sourceFile: SourceFile, compiler: IScalaPresentationCompiler): List[CompletionProposal] = {
     val wordStart = region.getOffset
     val wordAtPosition = (if (position <= wordStart) "" else scu.getContents.slice(wordStart, position).mkString.trim).toArray
     val typed = new compiler.Response[compiler.Tree]
@@ -59,7 +61,7 @@ class ScalaCompletions extends HasLogger {
 
       val context = CompletionContext(contextType)
 
-      compiler.askOption { () =>
+      compiler.asyncExec {
         for (completion <- completions) {
           val completionProposal = completion match {
             case compiler.TypeMember(sym, tpe, true, inherited, viaView) if completionFilter(sym, viaView, Some(inherited)) =>
@@ -75,7 +77,7 @@ class ScalaCompletions extends HasLogger {
             }
           }
         }
-      }
+      }.getOption()
     }
 
     def fillTypeCompletions(pos: Int, contextType: ContextType = CompletionContext.DefaultContext,

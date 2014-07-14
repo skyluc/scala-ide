@@ -280,7 +280,7 @@ object SDTTestUtils extends HasLogger {
       projectSetup = new TestProjectSetup(testProjectName) {
         override lazy val project = scalaProject
       }
-      projectSetup.project.presentationCompiler { c => f(c) }
+      projectSetup.project.presentationCompiler.internal { c => f(c) }
     }
     finally EclipseUtils.workspaceRunnableIn(EclipseUtils.workspaceRoot.getWorkspace) { _ =>
       projectSetup.project.underlying.delete(true, null)

@@ -16,6 +16,7 @@ import org.scalaide.core.IScalaProject
 import org.scalaide.core.testsetup.SDTTestUtils
 import org.scalaide.util.internal.eclipse.EclipseUtils
 import org.junit.AfterClass
+import org.scalaide.core.compiler.IScalaPresentationCompiler
 
 /**
  * This class provides basic test behavior for all text changing operations that
@@ -142,7 +143,7 @@ trait CompilerSupport extends EclipseDocumentSupport {
     }
   }
 
-  def withCompiler(f: ScalaPresentationCompiler => Unit): Unit =
+  def withCompiler(f: IScalaPresentationCompiler => Unit): Unit =
     project.presentationCompiler { compiler =>
       f(compiler)
     }
