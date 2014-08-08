@@ -28,7 +28,6 @@ import org.eclipse.ui.PlatformUI
 import org.eclipse.core.runtime.jobs.Job
 import org.eclipse.core.runtime.jobs.ISchedulingRule
 import org.scalaide.logging.HasLogger
-import java.io.FileNotFoundException
 
 object EclipseUtils extends HasLogger {
 
@@ -154,21 +153,6 @@ object EclipseUtils extends HasLogger {
 
     def /(other: IPath): IPath =
       p append other
-  }
-
-  /**
-   * Read the content of a file whose `filePath` points to a location in a
-   * given `bundleId` and returns them. A [[scala.util.Failure]] is returned if
-   * either the file could not be found or if if it could not be accessed.
-   */
-  def fileContentFromBundle(bundleId: String, filePath: String): util.Try[String] = util.Try {
-    val e = Option(Platform.getBundle(bundleId)).flatMap(b => Option(b.getEntry(filePath)))
-    e.fold(throw new FileNotFoundException(s"$bundleId$filePath")) { e =>
-      val s = io.Source.fromInputStream(e.openStream(), "UTF-8")
-      val res = s.mkString
-      s.close()
-      res
-    }
   }
 
   /**
