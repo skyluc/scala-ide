@@ -153,11 +153,11 @@ class ScalaSourceViewerConfiguration(
     override def isIncluded(a: Annotation) =
       isShowInVerticalRuler(a)
 
-    val UnimplementedMembers = """(class .* needs to be abstract, since:\W*it has \d+ unimplemented members\.)[\S\s]*""".r
+    val UnimplementedMembers = """(class .* needs to be abstract, since:\W*it has \d+ unimplemented members\.)([\S\s]*)""".r
 
     val msgFormatter: String => String = {
-      case UnimplementedMembers(errorMsg) =>
-        convertContentToHtml(errorMsg)
+      case UnimplementedMembers(errorMsg, code) =>
+        s"${convertContentToHtml(errorMsg)}<pre><code>${convertContentToHtml(code)}</code></pre>"
       case str =>
         convertContentToHtml(str)
     }
