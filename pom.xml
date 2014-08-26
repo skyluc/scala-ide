@@ -274,6 +274,7 @@
         <scala212.source.feature.dir>org.scala-ide.scala212.build/org.scala-ide.scala212.source.feature</scala212.source.feature.dir>
         <sdt.core.dir>org.scala-ide.sdt.core</sdt.core.dir>
         <sdt.debug.dir>org.scala-ide.sdt.debug</sdt.debug.dir>
+        <sdt.feature.dir>org.scala-ide.sdt.feature</sdt.feature.dir>
         <sdt.update-site.dir>org.scala-ide.sdt.update-site</sdt.update-site.dir>
       </properties>
       <build>
@@ -413,6 +414,22 @@
                     <resource>
                       <directory>${scala212.source.feature.dir}/resources</directory>
                       <filtering>true</filtering>
+                    </resource>
+                  </resources>
+                  <overwrite>true</overwrite>
+                </configuration>
+              </execution>
+              <execution>
+                <id>copy-resources-sdt-feature</id>
+                <phase>validate</phase>
+                <goals>
+                  <goal>copy-resources</goal>
+                </goals>
+                <configuration>
+                  <outputDirectory>${sdt.feature.dir}</outputDirectory>
+                  <resources>
+                    <resource>
+                      <directory>${sdt.feature.dir}/resources/${scala.short.version}</directory>
                     </resource>
                   </resources>
                   <overwrite>true</overwrite>
