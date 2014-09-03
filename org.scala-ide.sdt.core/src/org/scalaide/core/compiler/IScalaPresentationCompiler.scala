@@ -291,7 +291,7 @@ object IScalaPresentationCompiler extends HasLogger {
                 None
 
               case Right(m: MissingResponse) =>
-                logger.info("MissingResponse in ask. Called from: " + m.getStackTrace().mkString("\n"))
+                logger.info("MissingResponse in ask. Called from: ", m)
                 None
 
               case Right(e: Throwable) =>
