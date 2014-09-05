@@ -68,6 +68,8 @@ class ScalaPresentationCompiler(project: IScalaProject, settings: Settings) exte
   with IScalaPresentationCompiler
   with HasLogger { self =>
 
+  import IScalaPresentationCompiler._
+
   def presentationReporter = reporter.asInstanceOf[ScalaPresentationCompiler.PresentationReporter]
   presentationReporter.compiler = this
 
@@ -274,12 +276,6 @@ class ScalaPresentationCompiler(project: IScalaProject, settings: Settings) exte
   }
 
   override def synchronizeNames = true
-
-  def withResponse[A](op: Response[A] => Any): Response[A] = {
-    val response = new Response[A]
-    op(response)
-    response
-  }
 
   override def logError(msg: String, t: Throwable) =
     eclipseLog.error(msg, t)

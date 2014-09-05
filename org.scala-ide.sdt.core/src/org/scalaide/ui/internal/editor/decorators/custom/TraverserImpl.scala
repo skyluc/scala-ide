@@ -48,7 +48,7 @@ object TraverserImpl extends HasLogger {
         } regions :+= annotation
         super.traverse(tree)
       }
-    }.traverse(compiler.withResponse[compiler.Tree](r => compiler.askLoadedTyped(sourceFile, keepLoaded = false, r)).get.fold(identity, _ => compiler.EmptyTree))
+    }.traverse(compiler.askLoadedTyped(sourceFile, keepLoaded = false).get.fold(identity, _ => compiler.EmptyTree))
     regions
   }
 

@@ -37,9 +37,7 @@ object ImplAbstractMembers {
 
       val enclosingTree = enclosingClassOrModule(srcFile, offset)
       if (enclosingTree != EmptyTree) {
-        compiler.withResponse[Tree] { response =>
-          compiler.askTypeAt(enclosingTree.pos, response)
-        }.get.left.toOption flatMap {
+        compiler.askTypeAt(enclosingTree.pos).get.left.toOption flatMap {
           case implDef: ImplDef =>
             Option(implAbstractProposals(implDef))
           case _ => None

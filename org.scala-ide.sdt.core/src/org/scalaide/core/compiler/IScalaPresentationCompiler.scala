@@ -43,6 +43,8 @@ import org.scalaide.core.internal.compiler.InternalServices
  */
 trait IScalaPresentationCompiler extends Global with CompilerApiExtensions with InternalServices {
 
+  import IScalaPresentationCompiler._
+
   /** Removes source files and top-level symbols, and issues a new typer run.
    *  Returns () to syncvar `response` on completion.
    */
@@ -187,9 +189,6 @@ trait IScalaPresentationCompiler extends Global with CompilerApiExtensions with 
    */
   def problemsOf(scu: InteractiveCompilationUnit): List[IProblem]
 
-  /** Convenience method for creating a Response */
-  def withResponse[A](op: Response[A] => Any): Response[A]
-
   /** Find the definition of given symbol. Returns a compilation unit and an offset in that unit.
    *
    *  @note The offset is relative to the Scala source file represented by the given unit. This may
@@ -240,6 +239,12 @@ trait IScalaPresentationCompiler extends Global with CompilerApiExtensions with 
 object IScalaPresentationCompiler extends HasLogger {
   /** The maximum time to wait for an `askOption` call to finish. */
   final val AskTimeout: Duration = if (IScalaPlugin().noTimeoutMode) Duration.Inf else 10000.millis
+
+  private[core] def withResponse[A](op: Response[A] => Any): Response[A] = {
+    val response = new Response[A]
+    op(response)
+    response
+  }
 
   object Implicits {
     implicit class RichResponse[A](val resp: Response[A]) extends AnyVal {
