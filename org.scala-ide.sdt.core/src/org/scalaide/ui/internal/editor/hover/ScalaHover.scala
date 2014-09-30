@@ -30,6 +30,8 @@ import org.eclipse.jdt.internal.ui.text.java.hover.JavadocHover
 import org.scalaide.ui.internal.editor.InteractiveCompilationUnitEditor
 import org.eclipse.core.filebuffers.FileBuffers
 import org.scalaide.core.extensions.SourceFileProviderRegistry
+import org.eclipse.ui.texteditor.ITextEditor
+import org.eclipse.jface.text.Region
 
 object ScalaHover extends HasLogger {
   /** could return null, but prefer to return empty (see API of ITextHover). */
@@ -96,6 +98,19 @@ object ScalaHover extends HasLogger {
 class ScalaHover extends ITextHover with ITextHoverExtension with ITextHoverExtension2 with HtmlHover {
   import ScalaHover._
 
+  private var icuEditor: Option[InteractiveCompilationUnitEditor] = None
+
+  def this(editor: InteractiveCompilationUnitEditor) {
+    this()
+    icuEditor = Option(editor)
+  }
+
+  /** Return a compilation unit corresponding to the given text viewer. May return `null` if not found.
+   *
+   *  This method relies on finding the associated document in the platform file-buffer manager. Files
+   *  open in an editor get there if the document provider is an instance of `FileDocumentProvider`,
+   *  but some editors don't rely on it (for example, the classfile editor).
+   */
   protected def getCompilationUnit(textViewer: ITextViewer): InteractiveCompilationUnit = {
     val doc = textViewer.getDocument
     val icu = for {
@@ -119,17 +134,27 @@ class ScalaHover extends ITextHover with ITextHoverExtension with ITextHoverExte
   def getInformationPresenterControlCreator(): IInformationControlCreator =
     new FocusedControlCreator(HoverFontId)
 
+  /** Return the associated hover information for the given region. The region is assumed to be
+   *  relative to the compilation unit, and this implementation uses the associated compilation unit
+   *  to translate it to a Scala-based offset.
+   *
+   *  For example, if the hover is installed on a Play template editor, the region is relative to the
+   *  template contents. This implementation will perform on-the-fly translation to Scala (using the
+   *  compilation unit) and translate the offset to the correct Scala-based index.
+   */
   override def getHoverInfo2(viewer: ITextViewer, region: IRegion): AnyRef = {
-    val icu = getCompilationUnit(viewer)
-    icu.withSourceFile({ (src, compiler) =>
+    val icu = icuEditor.map(_.getInteractiveCompilationUnit()).getOrElse(getCompilationUnit(viewer))
+    if (icu eq null) null
+    else icu.withSourceFile({ (src, compiler) =>
       import compiler.{ stringToTermName => _, stringToTypeName => _, _ }
       import RegionUtils._
       import HTMLPrinter._
 
+      val scalaRegion = new Region(icu.lastSourceMap().scalaPos(region.getOffset), region.getLength)
       val docComment = {
         val thisComment = {
           import compiler._
-          val wordPos = region.toRangePos(src)
+          val wordPos = scalaRegion.toRangePos(src)
           val pos = { val pTree = locateTree(wordPos); if (pTree.hasSymbolField) pTree.pos else wordPos }
           val tree = askTypeAt(pos).getOption()
           val askedOpt = asyncExec {
@@ -187,7 +212,7 @@ class ScalaHover extends ITextHover with ITextHoverExtension with ITextHoverExte
       }
 
       def typeMessage = {
-        val tree = askTypeAt(region.toRangePos(src)).getOption()
+        val tree = askTypeAt(scalaRegion.toRangePos(src)).getOption()
 
         val content = tree.flatMap(typeInfo).getOrElse("")
         if (content.isEmpty())

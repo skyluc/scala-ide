@@ -215,7 +215,7 @@ class ScalaSourceViewerConfiguration(
 
   override def getInformationPresenter(sourceViewer: ISourceViewer) = {
     val p = new InformationPresenter(getInformationControlCreator(sourceViewer))
-    val ip = new HoverInformationProvider(Some(new ScalaHover()))
+    val ip = new HoverInformationProvider(Some(new ScalaHover(editor)))
 
     p.setDocumentPartitioning(getConfiguredDocumentPartitioning(sourceViewer))
     getConfiguredContentTypes(sourceViewer) foreach (p.setInformationProvider(ip, _))
@@ -262,9 +262,10 @@ class ScalaSourceViewerConfiguration(
   }
 
   override def getTextHover(sv: ISourceViewer, contentType: String, stateMask: Int): ITextHover =
-    compilationUnit.map(scu =>
-      ScalaHoverDebugOverrideExtensionPoint.hoverFor(scu).getOrElse(new ScalaHover())
-    ).getOrElse(new DefaultTextHover(sv))
+    compilationUnit.map { scu =>
+      val hover = new ScalaHover(editor)
+      ScalaHoverDebugOverrideExtensionPoint.hoverFor(scu).getOrElse(hover)
+    }.getOrElse(new DefaultTextHover(sv))
 
   override def getHyperlinkDetectors(sv: ISourceViewer): Array[IHyperlinkDetector] = {
     val strategies = List(DeclarationHyperlinkDetector(), ImplicitHyperlinkDetector())
