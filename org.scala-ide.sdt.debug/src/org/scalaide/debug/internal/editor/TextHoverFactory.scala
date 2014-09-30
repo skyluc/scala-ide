@@ -29,8 +29,7 @@ class TextHoverFactory extends TextHoverFactoryInterface {
     var stringWasReturnedAtGetHoverInfo2 = false
 
     override def getHoverInfo2(viewer: ITextViewer, region: IRegion): AnyRef = {
-      val icu = getCompilationUnit(viewer)
-      icu.withSourceFile{(src, compiler) =>
+      scu.withSourceFile{(src, compiler) =>
         import compiler._
 
         val resp = askTypeAt(region.toRangePos(src))
