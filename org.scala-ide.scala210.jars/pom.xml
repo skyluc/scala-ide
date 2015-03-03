@@ -11,6 +11,13 @@
   <artifactId>org.scala-ide.scala210.jars</artifactId>
   <packaging>eclipse-plugin</packaging>
 
+  <repositories>
+    <repository>
+      <id>scala-staged</id>
+      <name>Scala staged</name>
+      <url>https://oss.sonatype.org/content/repositories/orgscala-lang-1186/</url>
+    </repository>
+  </repositories>
   <dependencies>
     <!-- toolchain, Scala library -->
     <dependency>
